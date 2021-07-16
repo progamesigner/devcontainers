@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NODE_VERSION=${1:-"14.17.3"}
+NODE_VERSION=${1:-"none"}
 
 set -e
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PHP_VERSION=${1:-"8.0.8"}
+PHP_VERSION=${1:-"none"}
 
 set -e
 
