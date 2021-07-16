@@ -38,23 +38,24 @@ if [ "${NODE_VERSION}" != "none" ]; then
     apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends --yes
 
+    export ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
         amd64*)
-            export NODE_ARCH=x64
+            export ARCHITECTURE=x64
         ;;
         arm64*)
-            export NODE_ARCH=arm64
+            export ARCHITECTURE=arm64
         ;;
         armhf*)
-            export NODE_ARCH=armv7l
+            export ARCHITECTURE=armv7l
         ;;
         i386*)
-            export NODE_ARCH=x86
+            export ARCHITECTURE=x86
         ;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    curl -sSL -o /tmp/node.tar.xz https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz
+    curl -sSL -o /tmp/node.tar.xz https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCHITECTURE}.tar.xz
     curl -sSL -o /tmp/SHASUMS256.txt.asc https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.asc
 
     export GNUPGHOME=$(mktemp -d)
