@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -e
-
 USERNAME=${1:-"vscode"}
 USER_UID=${2:-"1000"}
 USER_GID=${3:-"1000"}
+
+set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -69,7 +69,6 @@ echo "Packages to verify are installed: ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LI
 apt-get update
 apt-get install --no-install-recommends --yes ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LIST}
 apt-get upgrade --no-install-recommends --yes
-apt-get autoremove --yes
 
 # Ensure at least the en_US.UTF-8 UTF-8 locale is available
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
