@@ -70,8 +70,8 @@ if [ "${PHP_VERSION}" != "none" ]; then
     "
 
     apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
+    apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends -y
 
     curl -sSL -o /tmp/php.tar.xz https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz
     curl -sSL -o /tmp/php.tar.xz.asc https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc
@@ -83,10 +83,10 @@ if [ "${PHP_VERSION}" != "none" ]; then
     done
     gpg --batch --verify /tmp/php.tar.xz.asc /tmp/php.tar.xz
     gpgconf --kill all
-    rm -rf ${GNUPGHOME}
+    rm -vrf ${GNUPGHOME}
 
     mkdir -p /usr/src/php
-    tar --directory=/usr/src/php --extract --file=/tmp/php.tar.xz --strip-components=1 --xz
+    tar -vxJf /tmp/php.tar.xz -C /usr/src/php --strip-components=1
 
     cd /usr/src/php
     export CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
@@ -116,17 +116,17 @@ if [ "${PHP_VERSION}" != "none" ]; then
     make -j $(nproc)
     make install
 
-    mkdir -p ${PHP_INI_DIR}/conf.d
+    mkdir -vp ${PHP_INI_DIR}/conf.d
     cp -v /tmp/php.tar.xz /usr/src/php.tar.xz
     cp -v php.ini-* ${PHP_INI_DIR}
     curl -sSL -o /usr/local/bin/docker-php-source https://raw.githubusercontent.com/docker-library/php/master/docker-php-source
     curl -sSL -o /usr/local/bin/docker-php-ext-configure https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-configure
     curl -sSL -o /usr/local/bin/docker-php-ext-enable https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-enable
     curl -sSL -o /usr/local/bin/docker-php-ext-install https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-install
-    chmod +x /usr/local/bin/docker-php-*
+    chmod -v +x /usr/local/bin/docker-php-*
 
     cd -
-    rm -rf /tmp/php.tar.xz.asc /tmp/php.tar.xz /usr/src/php
+    rm -vrf /tmp/php.tar.xz.asc /tmp/php.tar.xz /usr/src/php
 
     echo "export PHP_INI_DIR=${PHP_INI_DIR}" >> /etc/bash.bashrc
     docker-php-ext-enable sodium

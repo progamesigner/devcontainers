@@ -67,8 +67,8 @@ DEVELOPMENT_PACKAGE_LIST="\
 
 echo "Packages to verify are installed: ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LIST}"
 apt-get update
-apt-get install --no-install-recommends --yes ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LIST}
-apt-get upgrade --no-install-recommends --yes
+apt-get install --no-install-recommends -y ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LIST}
+apt-get upgrade --no-install-recommends -y
 
 # Ensure at least the en_US.UTF-8 UTF-8 locale is available
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
@@ -76,12 +76,12 @@ locale-gen
 
 # Create non-root user with matched UID/GID
 if [ "${USERNAME}" != "root" ]; then
-    groupadd --gid ${USER_GID} ${USERNAME}
-    useradd --create-home --gid ${USER_GID} --shell /bin/bash --uid ${USER_UID} ${USERNAME}
+    groupadd -g ${USER_GID} ${USERNAME}
+    useradd -ms /bin/bash -g ${USER_GID} -u ${USER_UID} ${USERNAME}
 
     # Add non-root user to sudoers
     echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
-    chmod 0440 /etc/sudoers.d/${USERNAME}
+    chmod -v 0440 /etc/sudoers.d/${USERNAME}
 fi
 
 # Add shim: code - it fallbacks to code-insiders if code is not available
@@ -104,7 +104,7 @@ else
 fi
 EOF
 )" > /usr/local/bin/code
-chmod +x /usr/local/bin/code
+chmod -v +x /usr/local/bin/code
 
 # Add shim: systemctl - tells people to use 'service' if systemd is not running
 echo "$(cat << 'EOF'
@@ -119,7 +119,7 @@ else
 fi
 EOF
 )" > /usr/local/bin/systemctl
-chmod +x /usr/local/bin/systemctl
+chmod -v +x /usr/local/bin/systemctl
 
 # Configure shell
 SHELL_RC_SNIPPET="$(cat << 'EOF'
@@ -184,11 +184,11 @@ else
 fi
 
 if [ ! -f ${USER_RC_PATH}/.bashrc ] || [ ! -s ${USER_RC_PATH}/.bashrc ] ; then
-    cp /etc/skel/.bashrc ${USER_RC_PATH}/.bashrc
+    cp -v /etc/skel/.bashrc ${USER_RC_PATH}/.bashrc
 fi
 
 if  [ ! -f ${USER_RC_PATH}/.profile ] || [ ! -s ${USER_RC_PATH}/.profile ] ; then
-    cp /etc/skel/.profile ${USER_RC_PATH}/.profile
+    cp -v /etc/skel/.profile ${USER_RC_PATH}/.profile
 fi
 
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
@@ -198,6 +198,6 @@ if [ "${USERNAME}" != "root" ]; then
     echo "${USER_RC_SNIPPET}" >> /root/.bashrc
     echo 'export PROMPT_DIRTRIM=4' >> /root/.bashrc
 fi
-chown ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.bashrc
+chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.bashrc
 
 echo "Done!"

@@ -41,8 +41,8 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     "
 
     apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
+    apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends -y
 
     curl -sSL -o /tmp/python.tar.xz https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
     curl -sSL -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
@@ -54,10 +54,10 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     done
     gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
     gpgconf --kill all
-    rm -rf ${GNUPGHOME}
+    rm -v -rf ${GNUPGHOME}
 
-    mkdir -p /usr/src/python
-    tar --directory=/usr/src/python --extract --file=/tmp/python.tar.xz --strip-components=1 --xz
+    mkdir -vp /usr/src/python
+    tar -vxJf /tmp/python.tar.xz -C /usr/src/python --strip-components=1
 
     cd /usr/src/python
     export CFLAGS=""
@@ -74,13 +74,13 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     make -j $(nproc)
     make install
 
-    ln -s /usr/local/bin/idle3 /usr/local/bin/idle
-    ln -s /usr/local/bin/pydoc3 /usr/local/bin/pydoc
-    ln -s /usr/local/bin/python3 /usr/local/bin/python
-    ln -s /usr/local/bin/python3-config /usr/local/bin/python-config
+    ln -vs /usr/local/bin/idle3 /usr/local/bin/idle
+    ln -vs /usr/local/bin/pydoc3 /usr/local/bin/pydoc
+    ln -vs /usr/local/bin/python3 /usr/local/bin/python
+    ln -vs /usr/local/bin/python3-config /usr/local/bin/python-config
 
     cd -
-    rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
+    rm -vrf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
 fi
 
 echo "Done!"

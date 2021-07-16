@@ -35,8 +35,8 @@ if [ "${NODE_VERSION}" != "none" ]; then
     "
 
     apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
+    apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends -y
 
     export ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
@@ -63,14 +63,14 @@ if [ "${NODE_VERSION}" != "none" ]; then
         gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}
     done
-    gpg --batch --decrypt --output /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc
+    gpg --batch -d -o /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/node.tar.xz | cut -d ' ' -f 1)"
     gpgconf --kill all
-    rm -rf ${GNUPGHOME}
+    rm -vrf ${GNUPGHOME}
 
-    tar --directory=/usr/local --extract --file=/tmp/node.tar.xz --strip-components=1 --xz
+    tar -vxJf /tmp/node.tar.xz -C /usr/local --strip-components=1
 
-    rm -rf /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc /tmp/node.tar.xz
+    rm -vrf /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc /tmp/node.tar.xz
 fi
 
 echo "Done!"
