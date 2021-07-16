@@ -27,7 +27,7 @@ if [ "${NODE_VERSION}" != "none" ]; then
         B9E2F5981AA6E0CD28160D9FF13993A75599653C \
     "
 
-    echo "Building Node ${NODE_VERSION} from source ..."
+    echo "Extract Node ${NODE_VERSION} ..."
 
     BUILD_PACKAGES="\
         dpkg-dev \
