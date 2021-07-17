@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 KUBECTL_VERSION=${1:-"none"}
-KUBECTL_CHECK=${2:-"true"}
+KUBECTL_SHA256=${2:-"automatic"}
 
 set -e
 
@@ -36,8 +36,11 @@ if [ "${KUBECTL_VERSION}" != "none" ]; then
     curl -sSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCHITECTURE}/kubectl
     chmod -v +x /usr/local/bin/kubectl
 
-    if [ "${KUBECTL_CHECK}" = "true" ]; then
+    if [ "${KUBECTL_SHA256}" = "automatic" ]; then
         KUBECTL_SHA256=$(curl -sSL https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/${ARCHITECTURE}/kubectl.sha256)
+    fi
+
+    if [ "${KUBECTL_SHA256}" != "skip" ]; then
         echo "${KUBECTL_SHA256}" | grep "$(sha256sum /usr/local/bin/kubectl | cut -d ' ' -f 1)"
     fi
 fi
