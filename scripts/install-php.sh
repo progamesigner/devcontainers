@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 PHP_VERSION=${1:-"none"}
+PHP_INI_DIR=${2:-"/usr/local/etc/php"}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
-export PHP_INI_DIR=/usr/local/etc/php
 
 # Check the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
@@ -14,10 +14,10 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "${PHP_VERSION}" != "none" ]; then
-    export GPG_KEYS=""
+    GPG_KEYS=""
 
     # PHP 8.1
-    export GPG_KEYS="\
+    GPG_KEYS="\
         528995BFEDFBA7191D46839EF9BA0ADA31CBD89E \
         39B641343D8C104B2B146DC3F9C39DC0B9698544 \
         F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD \
@@ -25,21 +25,21 @@ if [ "${PHP_VERSION}" != "none" ]; then
     "
 
     # PHP 8.0
-    export GPG_KEYS="\
+    GPG_KEYS="\
         1729F83938DA44E27BA0F4D3DBDB397470D12172 \
         BFDDD28642824F8118EF77909B67A5C12229118F \
         ${GPG_KEYS}
     "
 
     # PHP 7.4
-    export GPG_KEYS="\
+    GPG_KEYS="\
         5A52880781F755608BF815FC910DEB46F53EA312 \
         42670A7FE4D0441C8E4632349E4FDC074A4EF02D \
         ${GPG_KEYS}
     "
 
     # PHP 7.3
-    export GPG_KEYS="\
+    GPG_KEYS="\
         CBAF69F173A0FEA4B537F470D66C9593118BCCB6 \
         F38252826ACD957EF380D39F2F7956BC5DA04B5D \
         ${GPG_KEYS}
@@ -76,7 +76,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
     curl -sSL -o /tmp/php.tar.xz https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz
     curl -sSL -o /tmp/php.tar.xz.asc https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc
 
-    export GNUPGHOME=$(mktemp -d)
+    GNUPGHOME=$(mktemp -d)
     for GPG_KEY in ${GPG_KEYS}; do
         gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}

@@ -24,20 +24,12 @@ if [ "${HUGO_VERSION}" != "none" ]; then
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends -y
 
-    export ARCHITECTURE=""
+    ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
-        amd64*)
-            export ARCHITECTURE=64bit
-        ;;
-        arm64*)
-            export ARCHITECTURE=ARM64
-        ;;
-        armhf*)
-            export ARCHITECTURE=ARM
-        ;;
-        i386*)
-            export ARCHITECTURE=32bit
-        ;;
+        amd64*) ARCHITECTURE=64bit;;
+        arm64*) ARCHITECTURE=ARM64;;
+        armhf*) ARCHITECTURE=ARM;;
+        i386*) ARCHITECTURE=32bit;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 

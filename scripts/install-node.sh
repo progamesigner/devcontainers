@@ -13,7 +13,7 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "${NODE_VERSION}" != "none" ]; then
-    export GPG_KEYS="\
+    GPG_KEYS="\
         4ED778F539E3634C779C87C6D7062848A1AB005C \
         94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
         74F12602B6F1C4E913FAA37AD3A89613643B6201 \
@@ -38,27 +38,19 @@ if [ "${NODE_VERSION}" != "none" ]; then
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends -y
 
-    export ARCHITECTURE=""
+    ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
-        amd64*)
-            export ARCHITECTURE=x64
-        ;;
-        arm64*)
-            export ARCHITECTURE=arm64
-        ;;
-        armhf*)
-            export ARCHITECTURE=armv7l
-        ;;
-        i386*)
-            export ARCHITECTURE=x86
-        ;;
+        amd64*) ARCHITECTURE=x64;;
+        arm64*) ARCHITECTURE=arm64;;
+        armhf*) ARCHITECTURE=armv7l;;
+        i386*) ARCHITECTURE=x86;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
     curl -sSL -o /tmp/node.tar.xz https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCHITECTURE}.tar.xz
     curl -sSL -o /tmp/SHASUMS256.txt.asc https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.asc
 
-    export GNUPGHOME=$(mktemp -d)
+    GNUPGHOME=$(mktemp -d)
     for GPG_KEY in ${GPG_KEYS}; do
         gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}

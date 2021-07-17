@@ -13,7 +13,7 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "${PYTHON_VERSION}" != "none" ]; then
-    export GPG_KEYS="\
+    GPG_KEYS="\
         E3FF2839C048B25C084DEBE9B26995E310250568 \
     "
 
@@ -47,7 +47,7 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     curl -sSL -o /tmp/python.tar.xz https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
     curl -sSL -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 
-    export GNUPGHOME=$(mktemp -d)
+    GNUPGHOME=$(mktemp -d)
     for GPG_KEY in ${GPG_KEYS}; do
         gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}
