@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+DOCKER_VERSION=${1:-"none"}
+DOCKER_SHA256=${2:-"skip"}
+
+set -e
+
+export DEBIAN_FRONTEND=noninteractive
+
+# Check the script is run as root
+if [ "$(id -u)" -ne 0 ]; then
+    echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
+    exit 1
+fi
+
+if [ "${DOCKER_VERSION}" != "none" ]; then
+    echo "Extract Docker ${DOCKER_VERSION} ..."
+
+    BUILD_PACKAGES="\
+        dpkg-dev \
+        gzip \
+    "
+
+    apt-get update
+    apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends -y
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=x86_64;;
+        arm64) ARCHITECTURE=aarch64;;
+        armel) ARCHITECTURE=armel;;
+        armhf) ARCHITECTURE=armhf;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz
+
+    tar -vxzf /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
+
+    # Docker doesn't provide any checksum files yet
+    if [ "${DOCKER_SHA256}" != "skip" ]; then
+        echo "${DOCKER_SHA256}" | grep "$(sha256sum /usr/local/bin/docker | cut -d ' ' -f 1)"
+    fi
+
+    rm -vrf /tmp/docker.tar.gz
+fi
+
+echo "Done!"
