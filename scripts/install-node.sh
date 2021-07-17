@@ -50,7 +50,7 @@ if [ "${NODE_VERSION}" != "none" ]; then
     curl -sSL -o /tmp/node.tar.xz https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCHITECTURE}.tar.xz
     curl -sSL -o /tmp/SHASUMS256.txt.asc https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.asc
 
-    GNUPGHOME=$(mktemp -d)
+    export GNUPGHOME=$(mktemp -d)
     for GPG_KEY in ${GPG_KEYS}; do
         gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
         gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}
