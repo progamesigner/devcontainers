@@ -40,10 +40,10 @@ if [ "${NODE_VERSION}" != "none" ]; then
 
     ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
-        amd64*) ARCHITECTURE=x64;;
-        arm64*) ARCHITECTURE=arm64;;
-        armhf*) ARCHITECTURE=armv7l;;
-        i386*) ARCHITECTURE=x86;;
+        amd64) ARCHITECTURE=x64;;
+        arm64) ARCHITECTURE=arm64;;
+        armhf) ARCHITECTURE=armv7l;;
+        i386) ARCHITECTURE=x86;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
