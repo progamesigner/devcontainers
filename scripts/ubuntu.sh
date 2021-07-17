@@ -125,10 +125,10 @@ chmod -v +x /usr/local/bin/systemctl
 SHELL_RC_SNIPPET="$(cat << 'EOF'
 
 if [ -z "${USER}" ]; then export USER=$(whoami); fi
-if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi
+if [[ "${PATH}" != *"${HOME}/.local/bin"* ]]; then export PATH=${PATH}:${HOME}/.local/bin; fi
 
 # Display optional first run image specific notice if configured and terminal is interactive
-if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespaces" ]] && [ ! -f $HOME/.config/vscode-dev-containers/first-run-notice-already-displayed ]; then
+if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespaces" ]] && [ ! -f ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed ]; then
     if [ -f /usr/local/etc/vscode-dev-containers/first-run-notice.txt ]; then
         cat /usr/local/etc/vscode-dev-containers/first-run-notice.txt
     elif [ -f /workspaces/.codespaces/shared/first-run-notice.txt ]; then
@@ -140,7 +140,7 @@ fi
 
 # Set the default git editor
 if [ "${TERM_PROGRAM}" = "vscode" ]; then
-    if [[ -n $(command -v code-insiders) &&  -z $(command -v code) ]]; then
+    if [[ -n $(command -v code-insiders) && -z $(command -v code) ]]; then
         export GIT_EDITOR="code-insiders --wait"
     else
         export GIT_EDITOR="code --wait"
@@ -183,11 +183,11 @@ else
     USER_RC_PATH=/home/${USERNAME}
 fi
 
-if [ ! -f ${USER_RC_PATH}/.bashrc ] || [ ! -s ${USER_RC_PATH}/.bashrc ] ; then
+if [ ! -f ${USER_RC_PATH}/.bashrc ] || [ ! -s ${USER_RC_PATH}/.bashrc ]; then
     cp -v /etc/skel/.bashrc ${USER_RC_PATH}/.bashrc
 fi
 
-if  [ ! -f ${USER_RC_PATH}/.profile ] || [ ! -s ${USER_RC_PATH}/.profile ] ; then
+if [ ! -f ${USER_RC_PATH}/.profile ] || [ ! -s ${USER_RC_PATH}/.profile ]; then
     cp -v /etc/skel/.profile ${USER_RC_PATH}/.profile
 fi
 
