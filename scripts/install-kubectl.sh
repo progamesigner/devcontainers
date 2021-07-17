@@ -25,11 +25,11 @@ if [ "${KUBECTL_VERSION}" != "none" ]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    if [ "${KUBECTL_VERSION}" = "current" ]; then
-        KUBECTL_VERSION=$(curl -sSL https://dl.k8s.io/release/stable.txt)
+    if [ "${KUBECTL_VERSION}" = "latest" ]; then
+        KUBECTL_VERSION=$(curl -sSL https://api.github.com/repos/kubernetes/kubernetes/releases/latest | jq -r ".tag_name")
     fi
 
-    if [ "${KUBECTL_VERSION::1}" != 'v' ]; then
+    if [ "${KUBECTL_VERSION::1}" != "v" ]; then
         KUBECTL_VERSION=v${KUBECTL_VERSION}
     fi
 

@@ -33,8 +33,16 @@ if [ "${HUGO_VERSION}" != "none" ]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    curl -sSL -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-${ARCHITECTURE}.tar.gz
-    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_checksums.txt
+    if [ "${HUGO_VERSION}" = "latest" ]; then
+        HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r ".tag_name")
+    fi
+
+    if [ "${HUGO_VERSION::1}" != "v" ]; then
+        HUGO_VERSION=v${HUGO_VERSION}
+    fi
+
+    curl -sSL -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/${HUGO_VERSION}/hugo_${HUGO_VERSION#v}_Linux-${ARCHITECTURE}.tar.gz
+    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/gohugoio/hugo/releases/download/${HUGO_VERSION}/hugo_${HUGO_VERSION#v}_checksums.txt
 
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/hugo.tar.gz | cut -d ' ' -f 1)"
 
