@@ -14,13 +14,13 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "${KUBECTL_VERSION}" != "none" ]; then
-    echo "Extract kubectl ${HUGO_VERSION} ..."
+    echo "Setup kubectl v${HUGO_VERSION} ..."
 
     ARCHITECTURE=""
     case "$(uname -m)" in
         x86_64*) ARCHITECTURE=amd64;;
-        aarch64 | armv8*) ARCHITECTURE=arm64;;
-        aarch32 | armv7* | armvhf*) ARCHITECTURE=arm;;
+        aarch64|armv8*) ARCHITECTURE=arm64;;
+        aarch32|armv7*|armvhf*) ARCHITECTURE=arm;;
         i?86) ARCHITECTURE=386;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac

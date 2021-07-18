@@ -12,13 +12,13 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-if [ "${HUGO_VERSION}" != "none" ]; then
-    echo "Extract Hugo ${HUGO_VERSION} ..."
+BUILD_PACKAGES="\
+    dpkg-dev \
+    gzip \
+"
 
-    BUILD_PACKAGES="\
-        dpkg-dev \
-        gzip \
-    "
+if [ "${HUGO_VERSION}" != "none" ]; then
+    echo "Setup Hugo v${HUGO_VERSION} ..."
 
     apt-get update
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
@@ -47,7 +47,7 @@ if [ "${HUGO_VERSION}" != "none" ]; then
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/hugo.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/hugo
-    tar -vxzf /tmp/hugo.tar.gz -C /tmp/hugo
+    tar -vxz -f /tmp/hugo.tar.gz -C /tmp/hugo
     cp -v /tmp/hugo/hugo /usr/local/bin/hugo
 
     rm -vrf /tmp/hugo /tmp/SHASUMS256.txt /tmp/hugo.tar.xz

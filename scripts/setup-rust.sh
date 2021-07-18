@@ -15,17 +15,17 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-if [ "${RUST_VERSION}" != "none" ]; then
-    echo "Extract Rust ${RUST_VERSION} ..."
+BUILD_PACKAGES="\
+    dpkg-dev \
+    gcc \
+    gzip \
+    libc-dev \
+    lldb \
+    rsync \
+"
 
-    BUILD_PACKAGES="\
-        dpkg-dev \
-        gcc \
-        gzip \
-        libc-dev \
-        lldb \
-        rsync \
-    "
+if [ "${RUST_VERSION}" != "none" ]; then
+    echo "Setup Rust v${RUST_VERSION} ..."
 
     apt-get update
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
@@ -50,7 +50,7 @@ if [ "${RUST_VERSION}" != "none" ]; then
     rm -vrf ${GNUPGHOME}
 
     mkdir -p /tmp/rust
-    tar -vxzf /tmp/rust.tar.gz -C /tmp/rust --strip-components=1
+    tar -vxz -f /tmp/rust.tar.gz -C /tmp/rust --strip-components=1
 
     RUST_COMPONENTS=$(cat /tmp/rust/components)
     for RUST_COMPONENT in ${RUST_COMPONENTS}; do

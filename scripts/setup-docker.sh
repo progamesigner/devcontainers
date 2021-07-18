@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DOCKER_VERSION=${1:-"none"}
-DOCKER_SHA256=${2:-"skip"}
+DOCKER_SHA256=${2:-"automatic"}
 
 set -e
 
@@ -13,13 +13,13 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-if [ "${DOCKER_VERSION}" != "none" ]; then
-    echo "Extract Docker ${DOCKER_VERSION} ..."
+BUILD_PACKAGES="\
+    dpkg-dev \
+    gzip \
+"
 
-    BUILD_PACKAGES="\
-        dpkg-dev \
-        gzip \
-    "
+if [ "${DOCKER_VERSION}" != "none" ]; then
+    echo "Setup Docker v${DOCKER_VERSION} ..."
 
     apt-get update
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
@@ -36,9 +36,13 @@ if [ "${DOCKER_VERSION}" != "none" ]; then
 
     curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz
 
-    tar -vxzf /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
+    tar -vxz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
 
-    # Docker doesn't provide any checksum files yet
+    if [ "${KUBECTL_SHA256}" = "automatic" ]; then
+        # Docker doesn't provide any checksum files yet ...
+        DOCKER_SHA256="skip"
+    fi
+
     if [ "${DOCKER_SHA256}" != "skip" ]; then
         echo "${DOCKER_SHA256}" | grep "$(sha256sum /usr/local/bin/docker | cut -d ' ' -f 1)"
     fi

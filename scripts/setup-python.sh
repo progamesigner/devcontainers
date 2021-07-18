@@ -12,33 +12,33 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
+BUILD_PACKAGES="\
+    dpkg-dev \
+    gcc \
+    libbz2-dev \
+    libc6-dev \
+    libffi-dev \
+    libgdbm-compat-dev \
+    libgdbm-dev \
+    liblzma-dev \
+    libncurses-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    lzma-dev \
+    make \
+    tk-dev \
+    uuid-dev \
+    xz-utils \
+    zlib1g-dev \
+"
+
+GPG_KEYS="\
+    E3FF2839C048B25C084DEBE9B26995E310250568 \
+"
+
 if [ "${PYTHON_VERSION}" != "none" ]; then
-    GPG_KEYS="\
-        E3FF2839C048B25C084DEBE9B26995E310250568 \
-    "
-
-    echo "Building Python ${PYTHON_VERSION} from source ..."
-
-    BUILD_PACKAGES="\
-        dpkg-dev \
-        gcc \
-        libbz2-dev \
-        libc6-dev \
-        libffi-dev \
-        libgdbm-compat-dev \
-        libgdbm-dev \
-        liblzma-dev \
-        libncurses-dev \
-        libreadline-dev \
-        libsqlite3-dev \
-        libssl-dev \
-        lzma-dev \
-        make \
-        tk-dev \
-        uuid-dev \
-        xz-utils \
-        zlib1g-dev \
-    "
+    echo "Build Python v${PYTHON_VERSION} from source ..."
 
     apt-get update
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
@@ -57,7 +57,7 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     rm -vrf ${GNUPGHOME}
 
     mkdir -p /usr/src/python
-    tar -vxJf /tmp/python.tar.xz -C /usr/src/python --strip-components=1
+    tar -vxJ -f /tmp/python.tar.xz -C /usr/src/python --strip-components=1
 
     cd /usr/src/python
     export CFLAGS=""
@@ -73,14 +73,14 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         --without-ensurepip
     make -j $(nproc)
     make install
+    cd -
+
+    rm -vrf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
 
     ln -vs /usr/local/bin/idle3 /usr/local/bin/idle
     ln -vs /usr/local/bin/pydoc3 /usr/local/bin/pydoc
     ln -vs /usr/local/bin/python3 /usr/local/bin/python
     ln -vs /usr/local/bin/python3-config /usr/local/bin/python-config
-
-    cd -
-    rm -vrf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
 fi
 
 echo "Done!"
