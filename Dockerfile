@@ -15,7 +15,7 @@ ARG PYTHON_VERSION=none
 ARG RUST_VERSION=none
 
 RUN apt-get update \
- && apt-get install --no-install-recommends --yes apt-utils ca-certificates curl \
+ && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes apt-utils ca-certificates curl \
  && bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/master/scripts/setup-ubuntu.sh)" -- "${USERNAME}" "${USER_UID}" "${USER_GID}" \
  && if [ -n "${DOCKER_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/master/scripts/setup-docker.sh)" -- "${DOCKER_VERSION}"; fi \
  && if [ -n "${HUGO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/master/scripts/setup-python.sh)" -- "${PYTHON_VERSION}"; fi \
