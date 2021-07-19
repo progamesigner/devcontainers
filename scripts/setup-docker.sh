@@ -38,7 +38,7 @@ if [ "${DOCKER_VERSION}" != "none" ]; then
 
     tar -vxz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
 
-    if [ "${KUBECTL_SHA256}" = "automatic" ]; then
+    if [ "${DOCKER_SHA256}" = "automatic" ]; then
         # Docker doesn't provide any checksum files yet ...
         DOCKER_SHA256="skip"
     fi
