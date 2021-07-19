@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 PHP_VERSION=${1:-"none"}
-PHP_INI_DIR=${2:-"/usr/local/etc/php"}
+COMPOSER_VERSION=${2:-"none"}
+XDEBUG_VERSION=${3:-"none"}
+PHP_INI_DIR=${4:-"/usr/local/etc/php"}
+COMPOSER_SHA256=${5:-"automatic"}
 
 set -e
 
@@ -133,6 +136,32 @@ if [ "${PHP_VERSION}" != "none" ]; then
 
     echo "export PHP_INI_DIR=${PHP_INI_DIR}" >> /etc/bash.bashrc
     docker-php-ext-enable sodium
+
+    if [ "${COMPOSER_VERSION}" != "none" ]; then
+        curl -sSL -o /usr/local/bin/composer https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar
+        chmod +x /usr/local/bin/composer
+
+        if [ "${COMPOSER_SHA256}" = "automatic" ]; then
+            COMPOSER_SHA256=$(curl -sSL https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar.sha256sum)
+        fi
+
+        if [ "${COMPOSER_SHA256}" != "skip" ]; then
+            echo "${COMPOSER_SHA256}" | grep "$(sha256sum /usr/local/bin/composer | cut -d ' ' -f 1)"
+        fi
+    fi
+
+    if [ "${XDEBUG_VERSION}" != "none" ]; then
+        docker-php-source extract
+        mkdir -p /usr/src/php/ext/xdebug
+        curl -sSL -o /tmp/php-xdebug.tar.gz https://xdebug.org/files/xdebug-${XDEBUG_VERSION}.tgz
+        tar -xz -f /tmp/php-xdebug.tar.gz -C /usr/src/php/ext/xdebug --strip-components=1
+        docker-php-ext-install xdebug
+        docker-php-source delete
+
+        echo "xdebug.mode = debug" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.start_with_request = yes" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
+        echo "xdebug.client_port = 9003" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
+    fi
 fi
 
 echo "Done!"
