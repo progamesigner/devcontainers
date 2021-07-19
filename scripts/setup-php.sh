@@ -98,6 +98,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
     export LDFLAGS="-Wl,-O1 -pie"
     ./configure \
         --build=$(dpkg-architecture --query DEB_BUILD_GNU_TYPE) \
+        --disable-phar \
         --enable-embed \
         --enable-ftp \
         --enable-mbstring \
@@ -112,7 +113,6 @@ if [ "${PHP_VERSION}" != "none" ]; then
         --with-openssl \
         --with-password-argon2 \
         --with-pdo-sqlite=/usr \
-        --with-pear \
         --with-pic \
         --with-sodium=shared \
         --with-sqlite3=/usr \
@@ -135,7 +135,10 @@ if [ "${PHP_VERSION}" != "none" ]; then
     chmod +x /usr/local/bin/docker-php-*
 
     echo "export PHP_INI_DIR=${PHP_INI_DIR}" >> /etc/bash.bashrc
+    docker-php-source extract
     docker-php-ext-enable sodium
+    docker-php-ext-install phar
+    docker-php-source delete
 
     if [ "${COMPOSER_VERSION}" != "none" ]; then
         curl -sSL -o /usr/local/bin/composer https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar
