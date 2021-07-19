@@ -54,15 +54,44 @@ PACKAGE_LIST="\
 "
 
 DEVELOPMENT_PACKAGE_LIST="\
+    coreutils \
+    cpio \
+    cpustat \
+    diffutils \
+    dnsutils \
+    ethtool \
+    findutils \
     htop \
+    ifstat \
+    iftop \
+    iperf \
     iproute2 \
+    iptables \
+    iptstate \
+    iputils-arping \
+    iputils-clockdiff \
+    iputils-ping \
+    iputils-tracepath \
     lsof \
+    lynx \
+    mtr \
     ncdu \
     net-tools \
+    netcat-openbsd \
+    nghttp2 \
+    openssl \
     psmisc \
     rsync \
+    socat \
     strace \
+    sysstat \
+    tcpdump \
+    telnet \
+    tree \
+    unzip \
     vim-tiny \
+    wget \
+    xxdiff \
 "
 
 echo "Packages to verify are installed: ${PACKAGE_LIST} ${DEVELOPMENT_PACKAGE_LIST}"
