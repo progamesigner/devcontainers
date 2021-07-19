@@ -1,6 +1,7 @@
+ARG DISTRO=ubuntu
 ARG VARIANT=focal
 
-FROM ubuntu:${VARIANT}
+FROM ${DISTRO}:${VARIANT}
 
 ARG SCRIPT_VERSION=master
 ARG USERNAME=vscode
