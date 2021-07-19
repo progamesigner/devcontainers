@@ -12,7 +12,7 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "${KUBECTL_VERSION}" != "none" ]; then
-    echo "Setup kubectl v${HUGO_VERSION} ..."
+    echo "Setup kubectl v${KUBECTL_VERSION} ..."
 
     ARCHITECTURE=""
     case "$(uname -m)" in
