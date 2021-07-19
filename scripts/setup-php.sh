@@ -6,6 +6,7 @@ PHP_INI_DIR=${2:-"/usr/local/etc/php"}
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
+export PHP_INI_DIR=${PHP_INI_DIR}
 
 # Check the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
@@ -108,6 +109,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
         --with-openssl \
         --with-password-argon2 \
         --with-pdo-sqlite=/usr \
+        --with-pear \
         --with-pic \
         --with-sodium=shared \
         --with-sqlite3=/usr \
@@ -130,7 +132,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
     chmod +x /usr/local/bin/docker-php-*
 
     echo "export PHP_INI_DIR=${PHP_INI_DIR}" >> /etc/bash.bashrc
-    PHP_INI_DIR=${PHP_INI_DIR} docker-php-ext-enable sodium
+    docker-php-ext-enable sodium
 fi
 
 echo "Done!"
