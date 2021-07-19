@@ -5,8 +5,6 @@ KUBECTL_SHA256=${2:-"automatic"}
 
 set -e
 
-export DEBIAN_FRONTEND=noninteractive
-
 # Check the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
