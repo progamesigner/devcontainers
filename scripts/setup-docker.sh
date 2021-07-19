@@ -36,7 +36,7 @@ if [ "${DOCKER_VERSION}" != "none" ]; then
 
     curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz
 
-    tar -vxz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
+    tar -xz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
 
     if [ "${DOCKER_SHA256}" = "automatic" ]; then
         # Docker doesn't provide any checksum files yet ...
@@ -47,7 +47,7 @@ if [ "${DOCKER_VERSION}" != "none" ]; then
         echo "${DOCKER_SHA256}" | grep "$(sha256sum /usr/local/bin/docker | cut -d ' ' -f 1)"
     fi
 
-    rm -vrf /tmp/docker.tar.gz
+    rm -rf /tmp/docker.tar.gz
 fi
 
 echo "Done!"

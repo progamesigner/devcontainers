@@ -47,10 +47,10 @@ if [ "${RUST_VERSION}" != "none" ]; then
     curl -sSL https://static.rust-lang.org/rust-key.gpg.ascii | gpg --import
     gpg --batch --verify /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
     gpgconf --kill all
-    rm -vrf ${GNUPGHOME}
+    rm -rf ${GNUPGHOME}
 
     mkdir -p /tmp/rust
-    tar -vxz -f /tmp/rust.tar.gz -C /tmp/rust --strip-components=1
+    tar -xz -f /tmp/rust.tar.gz -C /tmp/rust --strip-components=1
 
     RUST_COMPONENTS=$(cat /tmp/rust/components)
     for RUST_COMPONENT in ${RUST_COMPONENTS}; do
@@ -69,7 +69,7 @@ if [ "${RUST_VERSION}" != "none" ]; then
         done
     done
 
-    rm -vrf /tmp/rust /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
+    rm -rf /tmp/rust /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
 
     echo "export CARGO_HOME=${CARGO_HOME}" >> /etc/bash.bashrc
     echo "export PATH=\${CARGO_HOME}/bin:\${PATH}" >> /etc/bash.bashrc

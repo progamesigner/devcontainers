@@ -83,10 +83,10 @@ if [ "${PHP_VERSION}" != "none" ]; then
     done
     gpg --batch --verify /tmp/php.tar.xz.asc /tmp/php.tar.xz
     gpgconf --kill all
-    rm -vrf ${GNUPGHOME}
+    rm -rf ${GNUPGHOME}
 
     mkdir -p /usr/src/php
-    tar -vxJ -f /tmp/php.tar.xz -C /usr/src/php --strip-components=1
+    tar -xJ -f /tmp/php.tar.xz -C /usr/src/php --strip-components=1
 
     cd /usr/src/php
     export CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
@@ -121,16 +121,16 @@ if [ "${PHP_VERSION}" != "none" ]; then
     cp -v /tmp/php.tar.xz /usr/src/php.tar.xz
     cd -
 
-    rm -vrf /tmp/php.tar.xz.asc /tmp/php.tar.xz /usr/src/php
+    rm -rf /tmp/php.tar.xz.asc /tmp/php.tar.xz /usr/src/php
 
     curl -sSL -o /usr/local/bin/docker-php-source https://raw.githubusercontent.com/docker-library/php/master/docker-php-source
     curl -sSL -o /usr/local/bin/docker-php-ext-configure https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-configure
     curl -sSL -o /usr/local/bin/docker-php-ext-enable https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-enable
     curl -sSL -o /usr/local/bin/docker-php-ext-install https://raw.githubusercontent.com/docker-library/php/master/docker-php-ext-install
-    chmod -v +x /usr/local/bin/docker-php-*
+    chmod +x /usr/local/bin/docker-php-*
 
     echo "export PHP_INI_DIR=${PHP_INI_DIR}" >> /etc/bash.bashrc
-    docker-php-ext-enable sodium
+    PHP_INI_DIR=${PHP_INI_DIR} docker-php-ext-enable sodium
 fi
 
 echo "Done!"

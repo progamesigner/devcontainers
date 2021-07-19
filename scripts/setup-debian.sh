@@ -81,7 +81,7 @@ if [ "${USERNAME}" != "root" ]; then
 
     # Add non-root user to sudoers
     echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
-    chmod -v 0440 /etc/sudoers.d/${USERNAME}
+    chmod ug=rw,o= /etc/sudoers.d/${USERNAME}
 fi
 
 # Add shim: code - it fallbacks to code-insiders if code is not available
@@ -104,7 +104,7 @@ else
 fi
 EOF
 )" > /usr/local/bin/code
-chmod -v +x /usr/local/bin/code
+chmod +x /usr/local/bin/code
 
 # Add shim: systemctl - tells people to use 'service' if systemd is not running
 echo "$(cat << 'EOF'
@@ -119,7 +119,7 @@ else
 fi
 EOF
 )" > /usr/local/bin/systemctl
-chmod -v +x /usr/local/bin/systemctl
+chmod +x /usr/local/bin/systemctl
 
 # Configure shell
 SHELL_RC_SNIPPET="$(cat << 'EOF'

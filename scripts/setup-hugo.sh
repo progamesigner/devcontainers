@@ -47,10 +47,10 @@ if [ "${HUGO_VERSION}" != "none" ]; then
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/hugo.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/hugo
-    tar -vxz -f /tmp/hugo.tar.gz -C /tmp/hugo
+    tar -xz -f /tmp/hugo.tar.gz -C /tmp/hugo
     cp -v /tmp/hugo/hugo /usr/local/bin/hugo
 
-    rm -vrf /tmp/hugo /tmp/SHASUMS256.txt /tmp/hugo.tar.xz
+    rm -rf /tmp/hugo /tmp/SHASUMS256.txt /tmp/hugo.tar.xz
 fi
 
 echo "Done!"

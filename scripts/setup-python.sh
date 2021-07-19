@@ -54,10 +54,10 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     done
     gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
     gpgconf --kill all
-    rm -vrf ${GNUPGHOME}
+    rm -rf ${GNUPGHOME}
 
     mkdir -p /usr/src/python
-    tar -vxJ -f /tmp/python.tar.xz -C /usr/src/python --strip-components=1
+    tar -xJ -f /tmp/python.tar.xz -C /usr/src/python --strip-components=1
 
     cd /usr/src/python
     export CFLAGS=""
@@ -75,12 +75,12 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     make install
     cd -
 
-    rm -vrf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
+    rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
 
-    ln -vs /usr/local/bin/idle3 /usr/local/bin/idle
-    ln -vs /usr/local/bin/pydoc3 /usr/local/bin/pydoc
-    ln -vs /usr/local/bin/python3 /usr/local/bin/python
-    ln -vs /usr/local/bin/python3-config /usr/local/bin/python-config
+    ln -s /usr/local/bin/idle3 /usr/local/bin/idle
+    ln -s /usr/local/bin/pydoc3 /usr/local/bin/pydoc
+    ln -s /usr/local/bin/python3 /usr/local/bin/python
+    ln -s /usr/local/bin/python3-config /usr/local/bin/python-config
 fi
 
 echo "Done!"

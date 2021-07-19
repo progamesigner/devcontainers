@@ -58,11 +58,11 @@ if [ "${NODE_VERSION}" != "none" ]; then
     gpg --batch -d -o /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/node.tar.xz | cut -d ' ' -f 1)"
     gpgconf --kill all
-    rm -vrf ${GNUPGHOME}
+    rm -rf ${GNUPGHOME}
 
-    tar -vxJ -f /tmp/node.tar.xz -C /usr/local --strip-components=1
+    tar -xJ -f /tmp/node.tar.xz -C /usr/local --strip-components=1
 
-    rm -vrf /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc /tmp/node.tar.xz
+    rm -rf /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc /tmp/node.tar.xz
 fi
 
 echo "Done!"

@@ -32,7 +32,7 @@ if [ "${KUBECTL_VERSION}" != "none" ]; then
     fi
 
     curl -sSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCHITECTURE}/kubectl
-    chmod -v +x /usr/local/bin/kubectl
+    chmod +x /usr/local/bin/kubectl
 
     if [ "${KUBECTL_SHA256}" = "automatic" ]; then
         KUBECTL_SHA256=$(curl -sSL https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/${ARCHITECTURE}/kubectl.sha256)
