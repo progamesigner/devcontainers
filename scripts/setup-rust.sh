@@ -19,7 +19,6 @@ BUILD_PACKAGES="\
     gzip \
     libc-dev \
     lldb \
-    rsync \
 "
 
 if [ "${RUST_VERSION}" != "none" ]; then
