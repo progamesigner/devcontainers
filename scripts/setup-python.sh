@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# pip
+
 PYTHON_VERSION=${1:-"none"}
 
 set -e
@@ -68,9 +70,9 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         --enable-loadable-sqlite-extensions \
         --enable-optimizations \
         --enable-option-checking=fatal \
+        --with-ensurepip=install \
         --with-system-expat \
-        --with-system-ffi \
-        --without-ensurepip
+        --with-system-ffi
     make -j $(nproc)
     make install
     cd -
@@ -78,6 +80,7 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
 
     ln -s /usr/local/bin/idle3 /usr/local/bin/idle
+    ln -s /usr/local/bin/pip3 /usr/local/bin/pip
     ln -s /usr/local/bin/pydoc3 /usr/local/bin/pydoc
     ln -s /usr/local/bin/python3 /usr/local/bin/python
     ln -s /usr/local/bin/python3-config /usr/local/bin/python-config
