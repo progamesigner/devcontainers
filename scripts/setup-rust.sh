@@ -40,10 +40,13 @@ if [ "${RUST_VERSION}" != "none" ]; then
 
     curl -sSL -o /tmp/rust.tar.gz https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${PLATFORM}.tar.gz
     curl -sSL -o /tmp/rust.tar.gz.asc https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${PLATFORM}.tar.gz.asc
+    curl -sSL -o /tmp/rust-src.tar.gz https://static.rust-lang.org/dist/rustc-${RUST_VERSION}-src.tar.gz
+    curl -sSL -o /tmp/rust-src.tar.gz.asc https://static.rust-lang.org/dist/rustc-${RUST_VERSION}-src.tar.gz.asc
 
     export GNUPGHOME=$(mktemp -d)
     curl -sSL https://static.rust-lang.org/rust-key.gpg.ascii | gpg --import
     gpg --batch --verify /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
+    gpg --batch --verify /tmp/rust-src.tar.gz.asc /tmp/rust-src.tar.gz
     gpgconf --kill all
     rm -rf ${GNUPGHOME}
 
@@ -67,7 +70,10 @@ if [ "${RUST_VERSION}" != "none" ]; then
         done
     done
 
-    rm -rf /tmp/rust /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
+    mkdir -p /usr/local/lib/rustlib/src/rust
+    tar -xz -f /tmp/rust-src.tar.gz -C /usr/local/lib/rustlib/src/rust --strip-components=1
+
+    rm -rf /tmp/rust /tmp/rust.tar.gz.asc /tmp/rust-src.tar.gz.asc /tmp/rust-src.tar.gz /tmp/rust.tar.gz
 
     mkdir -p ${CARGO_HOME}
     chmod a+rwx ${CARGO_HOME}
