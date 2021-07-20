@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# https://github.com/microsoft/vscode-dev-containers/blob/main/script-library/rust-debian.sh
-
 RUST_VERSION=${1:-"none"}
 CARGO_HOME=${2:-"/usr/local/cargo"}
 
@@ -70,6 +68,9 @@ if [ "${RUST_VERSION}" != "none" ]; then
     done
 
     rm -rf /tmp/rust /tmp/rust.tar.gz.asc /tmp/rust.tar.gz
+
+    mkdir -p ${CARGO_HOME}
+    chmod a+rwx ${CARGO_HOME}
 
     echo "export CARGO_HOME=${CARGO_HOME}" >> /etc/bash.bashrc
     echo "export PATH=\${CARGO_HOME}/bin:\${PATH}" >> /etc/bash.bashrc
