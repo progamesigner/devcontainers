@@ -123,8 +123,8 @@ if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespace
     elif [ -f /workspaces/.codespaces/shared/first-run-notice.txt ]; then
         cat /workspaces/.codespaces/shared/first-run-notice.txt
     fi
-    mkdir -p $HOME/.config/vscode-dev-containers
-    ((sleep 3s; touch $HOME/.config/vscode-dev-containers/first-run-notice-already-displayed) &)
+    mkdir -p ${HOME}/.config/vscode-dev-containers
+    ((sleep 3s; touch ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed) &)
 fi
 
 # Set the default git editor
