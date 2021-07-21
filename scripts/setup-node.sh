@@ -15,6 +15,10 @@ fi
 
 BUILD_PACKAGES="\
     dpkg-dev \
+    g++ \
+    gcc \
+    libc-dev \
+    make \
     xz-utils \
 "
 
