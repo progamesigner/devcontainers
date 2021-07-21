@@ -161,6 +161,8 @@ if [ "${PHP_VERSION}" != "none" ]; then
         docker-php-ext-install xdebug
         docker-php-source delete
 
+        rm -rf /tmp/php-xdebug.tar.gz
+
         echo "xdebug.mode = debug" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.start_with_request = yes" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.client_port = 9003" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
