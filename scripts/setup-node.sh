@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 NODE_VERSION=${1:-"none"}
+NPM_HOME=${2:-"/usr/local/npm"}
 
 set -e
 
@@ -63,6 +64,12 @@ if [ "${NODE_VERSION}" != "none" ]; then
     tar -xJ -f /tmp/node.tar.xz -C /usr/local --strip-components=1
 
     rm -rf /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc /tmp/node.tar.xz
+
+    mkdir -p ${NPM_HOME}
+    chmod a+rwx ${NPM_HOME}
+
+    echo "prefix=${NPM_HOME}" >> /usr/local/etc/npmrc
+    echo "if [[ "\${PATH}" != *"\${NPM_HOME}/bin"* ]]; then export PATH="\${NPM_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
 fi
 
 echo "Done!"
