@@ -57,8 +57,8 @@ if [ "${NODE_VERSION}" != "none" ]; then
 
     export GNUPGHOME=$(mktemp -d)
     for GPG_KEY in ${GPG_KEYS}; do
-        gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY} || \
-        gpg --batch --keyserver keyserver.ubuntu.com --recv-keys ${GPG_KEY}
+        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEY} || \
+        gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY}
     done
     gpg --batch -d -o /tmp/SHASUMS256.txt /tmp/SHASUMS256.txt.asc
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/node.tar.xz | cut -d ' ' -f 1)"
