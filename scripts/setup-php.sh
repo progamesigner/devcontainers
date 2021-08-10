@@ -104,6 +104,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
         --enable-mbstring \
         --enable-mysqlnd \
         --enable-option-checking=fatal \
+        --enable-pcntl \
         --with-config-file-path=${PHP_INI_DIR} \
         --with-config-file-scan-dir=${PHP_INI_DIR}/conf.d \
         --with-curl \
