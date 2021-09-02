@@ -48,6 +48,6 @@ if [ "${DOCKER_VERSION}" != "none" ]; then
     fi
 
     rm -rf /tmp/docker.tar.gz
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

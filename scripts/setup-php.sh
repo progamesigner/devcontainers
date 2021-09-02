@@ -168,6 +168,6 @@ if [ "${PHP_VERSION}" != "none" ]; then
         echo "xdebug.start_with_request = yes" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
         echo "xdebug.client_port = 9003" >> ${PHP_INI_DIR}/conf.d/docker-php-ext-xdebug.ini
     fi
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

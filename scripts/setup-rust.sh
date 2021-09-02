@@ -79,6 +79,6 @@ if [ "${RUST_VERSION}" != "none" ]; then
 
     echo "export CARGO_HOME=${CARGO_HOME}" >> /etc/bash.bashrc
     echo "if [[ "\${PATH}" != *"\${CARGO_HOME}/bin"* ]]; then export PATH="\${CARGO_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

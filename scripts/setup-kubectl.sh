@@ -41,6 +41,6 @@ if [ "${KUBECTL_VERSION}" != "none" ]; then
     if [ "${KUBECTL_SHA256}" != "skip" ]; then
         echo "${KUBECTL_SHA256}" | grep "$(sha256sum /usr/local/bin/kubectl | cut -d ' ' -f 1)"
     fi
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

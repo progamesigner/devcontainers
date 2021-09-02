@@ -88,6 +88,6 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     ln -s /usr/local/bin/pydoc3 /usr/local/bin/pydoc
     ln -s /usr/local/bin/python3 /usr/local/bin/python
     ln -s /usr/local/bin/python3-config /usr/local/bin/python-config
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

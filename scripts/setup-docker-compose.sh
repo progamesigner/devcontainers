@@ -28,6 +28,6 @@ if [ "${DOCKER_COMPOSE_VERSION}" != "none" ]; then
     if [ "${DOCKER_COMPOSE_SHA256}" != "skip" ]; then
         echo "${DOCKER_COMPOSE_SHA256}" | grep "$(sha256sum /usr/local/bin/docker-compose | cut -d ' ' -f 1)"
     fi
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

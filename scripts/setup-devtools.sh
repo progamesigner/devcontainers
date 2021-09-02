@@ -58,6 +58,6 @@ if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
     apt-get update
     apt-get install --no-install-recommends -y ${PACKAGE_LIST}
     apt-get upgrade --no-install-recommends -y
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

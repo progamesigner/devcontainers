@@ -74,6 +74,6 @@ if [ "${NODE_VERSION}" != "none" ]; then
 
     echo "prefix=${NPM_HOME}" >> /usr/local/etc/npmrc
     echo "if [[ "\${PATH}" != *"\${NPM_HOME}/bin"* ]]; then export PATH="\${NPM_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
-fi
 
-echo "Done!"
+    echo "Done!"
+fi

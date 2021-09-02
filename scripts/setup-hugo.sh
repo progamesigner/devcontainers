@@ -51,6 +51,6 @@ if [ "${HUGO_VERSION}" != "none" ]; then
     cp -v /tmp/hugo/hugo /usr/local/bin/hugo
 
     rm -rf /tmp/hugo /tmp/SHASUMS256.txt /tmp/hugo.tar.xz
-fi
 
-echo "Done!"
+    echo "Done!"
+fi
