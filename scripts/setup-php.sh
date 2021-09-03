@@ -99,6 +99,7 @@ if [ "${PHP_VERSION}" != "none" ]; then
     ./configure \
         --build=$(dpkg-architecture --query DEB_BUILD_GNU_TYPE) \
         --disable-phar \
+        --enable-bcmath \
         --enable-embed \
         --enable-ftp \
         --enable-mbstring \
