@@ -17,6 +17,8 @@ fi
 
 BUILD_PACKAGES=" \
     bzip2 \
+    gcc \
+    pkg-config \
 "
 
 if [ "${PYPY_VERSION}" != "none" ] && [ "${PYPY_PYTHON_VERSION}" != "none" ]; then
