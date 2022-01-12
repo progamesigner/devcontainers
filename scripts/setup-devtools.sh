@@ -12,7 +12,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-PACKAGE_LIST="\
+PACKAGE_LIST=" \
     coreutils \
     cpio \
     cpustat \

@@ -12,7 +12,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-BUILD_PACKAGES="\
+BUILD_PACKAGES=" \
     dpkg-dev \
     gzip \
 "

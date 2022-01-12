@@ -22,7 +22,7 @@ if [ "${USERNAME}" = "root" ] || [ "${USERNAME}" = "none" ]; then
 fi
 
 # Install packages
-PACKAGE_LIST="\
+PACKAGE_LIST=" \
     apt-transport-https \
     apt-utils \
     bash \

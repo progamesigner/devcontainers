@@ -14,7 +14,7 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-BUILD_PACKAGES="\
+BUILD_PACKAGES=" \
     dpkg-dev \
     gcc \
     libbz2-dev \
@@ -35,7 +35,7 @@ BUILD_PACKAGES="\
     zlib1g-dev \
 "
 
-GPG_KEYS="\
+GPG_KEYS=" \
     A035C8C19219BA821ECEA86B64E628F8D684696D \
     E3FF2839C048B25C084DEBE9B26995E310250568 \
     0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D \
