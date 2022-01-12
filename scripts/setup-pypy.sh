@@ -29,10 +29,10 @@ if [ "${PYPY_VERSION}" != "none" ] && [ "${PYPY_PYTHON_VERSION}" != "none" ]; th
     apt-get upgrade --no-install-recommends -y
 
     ARCHITECTURE=""
-    case "$(uname -m)" in
-        x86_64*) ARCHITECTURE=linux64;;
-        aarch64|armv8*) ARCHITECTURE=aarch64;;
-        i?86) ARCHITECTURE=linux32;;
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=linux64;;
+        arm64) ARCHITECTURE=aarch64;;
+        i386) ARCHITECTURE=linux32;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 

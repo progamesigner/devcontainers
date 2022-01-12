@@ -28,17 +28,17 @@ if [ "${RUST_VERSION}" != "none" ]; then
     apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends -y
 
-    PLATFORM=""
+    ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
-        amd64) PLATFORM=x86_64-unknown-linux-gnu;;
-        arm64) PLATFORM=aarch64-unknown-linux-gnu;;
-        armhf) PLATFORM=armv7-unknown-linux-gnueabihf;;
-        i386) PLATFORM=i686-unknown-linux-gnu;;
+        amd64) ARCHITECTURE=x86_64-unknown-linux-gnu;;
+        arm64) ARCHITECTURE=aarch64-unknown-linux-gnu;;
+        armhf) ARCHITECTURE=armv7-unknown-linux-gnueabihf;;
+        i386) ARCHITECTURE=i686-unknown-linux-gnu;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    curl -sSL -o /tmp/rust.tar.gz https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${PLATFORM}.tar.gz
-    curl -sSL -o /tmp/rust.tar.gz.asc https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${PLATFORM}.tar.gz.asc
+    curl -sSL -o /tmp/rust.tar.gz https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${ARCHITECTURE}.tar.gz
+    curl -sSL -o /tmp/rust.tar.gz.asc https://static.rust-lang.org/dist/rust-${RUST_VERSION}-${ARCHITECTURE}.tar.gz.asc
     curl -sSL -o /tmp/rust-src.tar.gz https://static.rust-lang.org/dist/rustc-${RUST_VERSION}-src.tar.gz
     curl -sSL -o /tmp/rust-src.tar.gz.asc https://static.rust-lang.org/dist/rustc-${RUST_VERSION}-src.tar.gz.asc
 

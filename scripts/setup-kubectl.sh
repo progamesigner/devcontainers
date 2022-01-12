@@ -15,11 +15,11 @@ if [ "${KUBECTL_VERSION}" != "none" ]; then
     echo "Setup kubectl v${KUBECTL_VERSION} ..."
 
     ARCHITECTURE=""
-    case "$(uname -m)" in
-        x86_64*) ARCHITECTURE=amd64;;
-        aarch64|armv8*) ARCHITECTURE=arm64;;
-        aarch32|armv7*|armvhf*) ARCHITECTURE=arm;;
-        i?86) ARCHITECTURE=386;;
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        armel|armhf) ARCHITECTURE=arm;;
+        i386) ARCHITECTURE=386;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
