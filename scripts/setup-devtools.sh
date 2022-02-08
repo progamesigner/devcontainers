@@ -79,7 +79,7 @@ if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
     tar -xz -f /tmp/step-cli.tar.gz -C /tmp/step-cli --strip-components=1
     cp -v /tmp/step-cli/bin/step /usr/local/bin/step
 
-    rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.xz
+    rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.gz
 
     echo "Done!"
 fi
