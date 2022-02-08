@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 ENABLE_DEVTOOLS=${1:-"true"}
+STEP_CLI_VERSION=${2:-"none"}
 
 set -e
 
@@ -58,6 +59,27 @@ if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
     apt-get update
     apt-get install --no-install-recommends -y ${PACKAGE_LIST}
     apt-get upgrade --no-install-recommends -y
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        i386) ARCHITECTURE=386;;
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        armel) ARCHITECTURE=armv6;;
+        armhf) ARCHITECTURE=armv7;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    curl -sSL -o /tmp/step-cli.tar.gz https://github.com/smallstep/cli/releases/download/v${STEP_CLI_VERSION}/step_linux_${STEP_CLI_VERSION}_${ARCHITECTURE}.tar.gz
+    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/smallstep/cli/releases/download/v${STEP_CLI_VERSION}/checksums.txt
+
+    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/step-cli.tar.gz | cut -d ' ' -f 1)"
+
+    mkdir -p /tmp/step-cli
+    tar -xz -f /tmp/step-cli.tar.gz -C /tmp/step-cli --strip-components=1
+    cp -v /tmp/step-cli/bin/step /usr/local/bin/step
+
+    rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.xz
 
     echo "Done!"
 fi
