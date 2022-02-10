@@ -81,7 +81,7 @@ if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
         cp -v /tmp/step-cli/bin/step /usr/local/bin/step
 
         rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.gz
-    esac
+    fi
 
     echo "Done!"
 fi
