@@ -50,7 +50,6 @@ PACKAGE_LIST=" \
     tree \
     unzip \
     wget \
-    xxdiff \
 "
 
 if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
