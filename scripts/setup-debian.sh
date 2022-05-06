@@ -39,7 +39,6 @@ PACKAGE_LIST=" \
     libgssapi-krb5-2 \
     libicu[0-9][0-9] \
     libkrb5-3 \
-    libssl1.1 \
     libstdc++6 \
     locales \
     lsb-release \
@@ -53,6 +52,12 @@ PACKAGE_LIST=" \
     tzdata \
     vim-tiny \
 "
+
+if [ ! -z $(apt-cache --names-only search ^libssl3$) ]; then
+    PACKAGE_LIST="${PACKAGE_LIST} libssl3"
+elif [ ! -z $(apt-cache --names-only search ^libssl1.1$) ]; then
+    PACKAGE_LIST="${PACKAGE_LIST} libssl1.1"
+fi
 
 echo "Packages to verify are installed: ${PACKAGE_LIST}"
 apt-get update
