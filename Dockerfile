@@ -1,5 +1,5 @@
 ARG DISTRO=ubuntu
-ARG VARIANT=focal
+ARG VARIANT=jammy
 
 FROM ${DISTRO}:${VARIANT}
 
