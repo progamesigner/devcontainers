@@ -122,7 +122,7 @@ if [[ -z ${USER} ]]; then export USER=$(whoami); fi
 if [[ ${PATH} != *${HOME}/.local/bin* ]]; then export PATH=${PATH}:${HOME}/.local/bin; fi
 
 # Display optional first run image specific notice if configured and terminal is interactive
-if [[ -t 1 ]] && [[ ${TERM_PROGRAM} = vscode || ${TERM_PROGRAM} = codespaces ]] && [[ ! -f ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed ]]; then
+if [[ -t 1 && (${TERM_PROGRAM} = vscode || ${TERM_PROGRAM} = codespaces) && ! -f ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed ]]; then
     if [[ -f /usr/local/etc/vscode-dev-containers/first-run-notice.txt ]]; then
         cat /usr/local/etc/vscode-dev-containers/first-run-notice.txt
     elif [[ -f /workspaces/.codespaces/shared/first-run-notice.txt ]]; then
@@ -150,8 +150,8 @@ USER_RC_SNIPPET="$(cat \
 # Codespaces bash prompt theme
 __bash_prompt() {
     local userpart='`export XIT=$? \
-        && [[ -n ${GITHUB_USER} ]] && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
-        && [[ $XIT != 0 ]] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
+        && test -n ${GITHUB_USER} && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
+        && test ${XIT} -ne 0 && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
     local gitbranch='`\
         export BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null); \
         if [[ -n ${BRANCH} ]]; then \
