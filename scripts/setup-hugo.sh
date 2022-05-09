@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-HUGO_VERSION=${1:-"none"}
+HUGO_VERSION=${1:-none}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -17,7 +17,7 @@ BUILD_PACKAGES=" \
     gzip \
 "
 
-if [ "${HUGO_VERSION}" != "none" ]; then
+if [[ ${HUGO_VERSION} != none ]; then
     echo "Setup Hugo v${HUGO_VERSION} ..."
 
     apt-get update
@@ -33,11 +33,11 @@ if [ "${HUGO_VERSION}" != "none" ]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    if [ "${HUGO_VERSION}" = "latest" ]; then
+    if [[ ${HUGO_VERSION} = latest ]; then
         HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r ".tag_name")
     fi
 
-    if [ "${HUGO_VERSION::1}" != "v" ]; then
+    if [[ ${HUGO_VERSION} != v* ]; then
         HUGO_VERSION=v${HUGO_VERSION}
     fi
 

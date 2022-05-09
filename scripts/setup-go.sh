@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-GO_VERSION=${1:-"none"}
-GOROOT=${2:-"/usr/local/go"}
-GOPATH=${3:-"/opt/go"}
+GO_VERSION=${1:-none}
+GOROOT=${2:-/usr/local/go}
+GOPATH=${3:-/opt/go}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -22,7 +22,7 @@ BUILD_PACKAGES=" \
     pkg-config \
 "
 
-if [ "${GO_VERSION}" != "none" ]; then
+if [[ ${GO_VERSION} != none ]]; then
     echo "Setup Go v${GO_VERSION} ..."
 
     apt-get update

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-PHP_VERSION=${1:-"none"}
-COMPOSER_VERSION=${2:-"none"}
-XDEBUG_VERSION=${3:-"none"}
-PHP_INI_DIR=${4:-"/usr/local/etc/php"}
-COMPOSER_SHA256=${5:-"automatic"}
+PHP_VERSION=${1:-none}
+COMPOSER_VERSION=${2:-none}
+XDEBUG_VERSION=${3:-none}
+PHP_INI_DIR=${4:-/usr/local/etc/php}
+COMPOSER_SHA256=${5:-automatic}
 
 set -e
 
@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 export PHP_INI_DIR=${PHP_INI_DIR}
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -70,7 +70,7 @@ GPG_KEYS=" \
     ${GPG_KEYS}
 "
 
-if [ "${PHP_VERSION}" != "none" ]; then
+if [[ ${PHP_VERSION} != none ]]; then
     echo "Build PHP v${PHP_VERSION} from source ..."
 
     apt-get update
@@ -142,20 +142,20 @@ if [ "${PHP_VERSION}" != "none" ]; then
     docker-php-ext-install phar
     docker-php-source delete
 
-    if [ "${COMPOSER_VERSION}" != "none" ]; then
+    if [[ ${COMPOSER_VERSION} != none ]]; then
         curl -sSL -o /usr/local/bin/composer https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar
         chmod +x /usr/local/bin/composer
 
-        if [ "${COMPOSER_SHA256}" = "automatic" ]; then
+        if [[ ${COMPOSER_SHA256} = automatic ]]; then
             COMPOSER_SHA256=$(curl -sSL https://getcomposer.org/download/${COMPOSER_VERSION}/composer.phar.sha256sum)
         fi
 
-        if [ "${COMPOSER_SHA256}" != "skip" ]; then
+        if [[ ${COMPOSER_SHA256} != skip ]]; then
             echo "${COMPOSER_SHA256}" | grep "$(sha256sum /usr/local/bin/composer | cut -d ' ' -f 1)"
         fi
     fi
 
-    if [ "${XDEBUG_VERSION}" != "none" ]; then
+    if [[ ${XDEBUG_VERSION} != none ]]; then
         docker-php-source extract
         mkdir -p /usr/src/php/ext/xdebug
         curl -sSL -o /tmp/php-xdebug.tar.gz https://xdebug.org/files/xdebug-${XDEBUG_VERSION}.tgz

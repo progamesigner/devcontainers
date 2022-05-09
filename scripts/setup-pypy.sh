@@ -2,15 +2,15 @@
 
 # pip
 
-PYPY_VERSION=${1:-"none"}
-PYPY_PYTHON_VERSION=${2:-"none"}
+PYPY_VERSION=${1:-none}
+PYPY_PYTHON_VERSION=${2:-none}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -21,7 +21,7 @@ BUILD_PACKAGES=" \
     pkg-config \
 "
 
-if [ "${PYPY_VERSION}" != "none" ] && [ "${PYPY_PYTHON_VERSION}" != "none" ]; then
+if [[ ${PYPY_VERSION} != none && ${PYPY_PYTHON_VERSION} != none ]]; then
     echo "Setup PyPy${PYPY_PYTHON_VERSION} v${PYPY_VERSION} ..."
 
     apt-get update

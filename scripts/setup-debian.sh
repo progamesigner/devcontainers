@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-USERNAME=${1:-"vscode"}
-USER_UID=${2:-"1000"}
-USER_GID=${3:-"1000"}
+USERNAME=${1:-vscode}
+USER_UID=${2:-1000}
+USER_GID=${3:-1000}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
 
 # Allow use root as user
-if [ "${USERNAME}" = "root" ] || [ "${USERNAME}" = "none" ]; then
+if [[ ${USERNAME} = root || ${USERNAME} = none ]]; then
     USERNAME=root
     USER_UID=0
     USER_GID=0
@@ -53,9 +53,9 @@ PACKAGE_LIST=" \
     vim-tiny \
 "
 
-if [ ! -z $(apt-cache --names-only search ^libssl3$) ]; then
+if [[ -n $(apt-cache --names-only search ^libssl3$) ]]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl3"
-elif [ ! -z $(apt-cache --names-only search ^libssl1.1$) ]; then
+elif [[ -n $(apt-cache --names-only search ^libssl1.1$) ]]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl1.1"
 fi
 
@@ -69,7 +69,7 @@ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 
 # Create non-root user with matched UID/GID
-if [ "${USERNAME}" != "root" ]; then
+if [[ ${USERNAME} != root ]]; then
     groupadd -g ${USER_GID} ${USERNAME}
     useradd -ms /bin/bash -g ${USER_GID} -u ${USER_UID} ${USERNAME}
 
@@ -88,9 +88,9 @@ get_in_path_except_current() {
 
 code="$(get_in_path_except_current code)"
 
-if [ -n "$code" ]; then
+if [[ -n $code ]]; then
     exec "$code" "$@"
-elif [ "$(command -v code-insiders)" ]; then
+elif [[ -n $(command -v code-insiders) ]]; then
     exec code-insiders "$@"
 else
     echo "code or code-insiders is not installed" >&2
@@ -106,7 +106,7 @@ echo "$(cat << 'EOF'
 
 set -e
 
-if [ -d "/run/systemd/system" ]; then
+if [[ -d /run/systemd/system ]]; then
     exec /bin/systemctl/systemctl "$@"
 else
     echo '\n"systemd" is not running in this container due to its overhead.\nUse the "service" command to start services intead. e.g.: \n\nservice --status-all'
@@ -118,14 +118,14 @@ chmod +x /usr/local/bin/systemctl
 # Configure shell
 SHELL_RC_SNIPPET="$(cat << 'EOF'
 
-if [ -z "${USER}" ]; then export USER=$(whoami); fi
-if [[ "${PATH}" != *"${HOME}/.local/bin"* ]]; then export PATH=${PATH}:${HOME}/.local/bin; fi
+if [[ -z ${USER} ]]; then export USER=$(whoami); fi
+if [[ ${PATH} != *${HOME}/.local/bin* ]]; then export PATH=${PATH}:${HOME}/.local/bin; fi
 
 # Display optional first run image specific notice if configured and terminal is interactive
-if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespaces" ]] && [ ! -f ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed ]; then
-    if [ -f /usr/local/etc/vscode-dev-containers/first-run-notice.txt ]; then
+if [[ -t 1 ]] && [[ ${TERM_PROGRAM} = vscode || ${TERM_PROGRAM} = codespaces ]] && [[ ! -f ${HOME}/.config/vscode-dev-containers/first-run-notice-already-displayed ]]; then
+    if [[ -f /usr/local/etc/vscode-dev-containers/first-run-notice.txt ]]; then
         cat /usr/local/etc/vscode-dev-containers/first-run-notice.txt
-    elif [ -f /workspaces/.codespaces/shared/first-run-notice.txt ]; then
+    elif [[ -f /workspaces/.codespaces/shared/first-run-notice.txt ]]; then
         cat /workspaces/.codespaces/shared/first-run-notice.txt
     fi
     mkdir -p ${HOME}/.config/vscode-dev-containers
@@ -133,7 +133,7 @@ if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespace
 fi
 
 # Set the default git editor
-if [ "${TERM_PROGRAM}" = "vscode" ]; then
+if [[ ${TERM_PROGRAM} = vscode ]]; then
     if [[ -n $(command -v code-insiders) && -z $(command -v code) ]]; then
         export GIT_EDITOR="code-insiders --wait"
     else
@@ -150,11 +150,11 @@ USER_RC_SNIPPET="$(cat \
 # Codespaces bash prompt theme
 __bash_prompt() {
     local userpart='`export XIT=$? \
-        && [ ! -z "${GITHUB_USER}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
-        && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
+        && [[ -n ${GITHUB_USER} ]] && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
+        && [[ $XIT != 0 ]] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
     local gitbranch='`\
         export BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null); \
-        if [ "${BRANCH}" != "" ]; then \
+        if [[ -n ${BRANCH} ]]; then \
             echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH}" \
             && if git ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
                     echo -n " \[\033[1;33m\]✗"; \
@@ -171,24 +171,24 @@ __bash_prompt
 EOF
 )"
 
-if [ "${USERNAME}" = "root" ]; then
+if [[ ${USERNAME} = root ]]; then
     USER_RC_PATH=/root
 else
     USER_RC_PATH=/home/${USERNAME}
 fi
 
-if [ ! -f ${USER_RC_PATH}/.bashrc ] || [ ! -s ${USER_RC_PATH}/.bashrc ]; then
+if [[ ! -f ${USER_RC_PATH}/.bashrc || ! -s ${USER_RC_PATH}/.bashrc ]]; then
     cp -v /etc/skel/.bashrc ${USER_RC_PATH}/.bashrc
 fi
 
-if [ ! -f ${USER_RC_PATH}/.profile ] || [ ! -s ${USER_RC_PATH}/.profile ]; then
+if [[ ! -f ${USER_RC_PATH}/.profile || ! -s ${USER_RC_PATH}/.profile ]]; then
     cp -v /etc/skel/.profile ${USER_RC_PATH}/.profile
 fi
 
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
 echo "${USER_RC_SNIPPET}" >> ${USER_RC_PATH}/.bashrc
 echo 'export PROMPT_DIRTRIM=4' >> ${USER_RC_PATH}/.bashrc
-if [ "${USERNAME}" != "root" ]; then
+if [[ ${USERNAME} != root ]]; then
     echo "${USER_RC_SNIPPET}" >> /root/.bashrc
     echo 'export PROMPT_DIRTRIM=4' >> /root/.bashrc
 fi

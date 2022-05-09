@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-ENABLE_DEVTOOLS=${1:-"true"}
-STEP_CLI_VERSION=${2:-"none"}
+ENABLE_DEVTOOLS=${1:-true}
+STEP_CLI_VERSION=${2:-none}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -52,7 +52,7 @@ PACKAGE_LIST=" \
     wget \
 "
 
-if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
+if [[ ${ENABLE_DEVTOOLS} != false ]]; then
     echo "Install DevTools ..."
 
     apt-get update
@@ -69,7 +69,7 @@ if [ "${ENABLE_DEVTOOLS}" != "false" ]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    if [ "${STEP_CLI_VERSION}" != "none" ]; then
+    if [[ ${STEP_CLI_VERSION} != none ]]; then
         curl -sSL -o /tmp/step-cli.tar.gz https://github.com/smallstep/cli/releases/download/v${STEP_CLI_VERSION}/step_linux_${STEP_CLI_VERSION}_${ARCHITECTURE}.tar.gz
         curl -sSL -o /tmp/SHASUMS256.txt https://github.com/smallstep/cli/releases/download/v${STEP_CLI_VERSION}/checksums.txt
 

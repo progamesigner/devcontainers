@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-RUST_VERSION=${1:-"none"}
-CARGO_HOME=${2:-"/usr/local/cargo"}
+RUST_VERSION=${1:-none}
+CARGO_HOME=${2:-/usr/local/cargo}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -21,7 +21,7 @@ BUILD_PACKAGES=" \
     lldb \
 "
 
-if [ "${RUST_VERSION}" != "none" ]; then
+if [[ ${RUST_VERSION} != none ]]; then
     echo "Setup Rust v${RUST_VERSION} ..."
 
     apt-get update
@@ -55,11 +55,11 @@ if [ "${RUST_VERSION}" != "none" ]; then
     RUST_COMPONENTS=$(cat /tmp/rust/components)
     for RUST_COMPONENT in ${RUST_COMPONENTS}; do
         for DIRECTIVE in $(cat /tmp/rust/${RUST_COMPONENT}/manifest.in); do
-            if [[ "${DIRECTIVE}" = "file:"* ]]; then
+            if [[ ${DIRECTIVE} = file:* ]]; then
                 FILE=${DIRECTIVE#file:}
                 mkdir -p /usr/local/$(dirname ${FILE})
                 cp -v /tmp/rust/${RUST_COMPONENT}/${FILE} /usr/local/${FILE}
-            elif [[ "${DIRECTIVE}" = "dir:"* ]]; then
+            elif [[ ${DIRECTIVE} = dir:* ]]; then
                 DIR=${DIRECTIVE#dir:}
                 mkdir -p /usr/local/$(dirname ${DIR})
                 cp -v -R /tmp/rust/${RUST_COMPONENT}/${DIR} /usr/local/${DIR}

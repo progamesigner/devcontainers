@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-NODE_VERSION=${1:-"none"}
-NPM_HOME=${2:-"/usr/local/npm"}
+NODE_VERSION=${1:-none}
+NPM_HOME=${2:-/usr/local/npm}
 
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Check the script is run as root
-if [ "$(id -u)" -ne 0 ]; then
+if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
     exit 1
 fi
@@ -36,7 +36,7 @@ GPG_KEYS=" \
     B9E2F5981AA6E0CD28160D9FF13993A75599653C \
 "
 
-if [ "${NODE_VERSION}" != "none" ]; then
+if [[ ${NODE_VERSION} != none ]]; then
     echo "Setup Node v${NODE_VERSION} ..."
 
     apt-get update
