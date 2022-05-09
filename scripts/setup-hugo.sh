@@ -17,7 +17,7 @@ BUILD_PACKAGES=" \
     gzip \
 "
 
-if [[ ${HUGO_VERSION} != none ]; then
+if [[ ${HUGO_VERSION} != none ]]; then
     echo "Setup Hugo v${HUGO_VERSION} ..."
 
     apt-get update
@@ -33,11 +33,11 @@ if [[ ${HUGO_VERSION} != none ]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    if [[ ${HUGO_VERSION} = latest ]; then
+    if [[ ${HUGO_VERSION} = latest ]]; then
         HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/releases/latest | jq -r ".tag_name")
     fi
 
-    if [[ ${HUGO_VERSION} != v* ]; then
+    if [[ ${HUGO_VERSION} != v* ]]; then
         HUGO_VERSION=v${HUGO_VERSION}
     fi
 
