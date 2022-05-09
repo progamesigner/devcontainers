@@ -44,7 +44,7 @@ RUN apt-get update \
  && if [ -n "${BUF_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-buf.sh)" -- "${BUF_VERSION}"; fi \
  && if [ -n "${DOCKER_COMPOSE_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-docker-compose.sh)" -- "${DOCKER_COMPOSE_VERSION}"; fi \
  && if [ -n "${DOCKER_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-docker.sh)" -- "${DOCKER_VERSION}"; fi \
- && if [ -n "${GO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-hugo.sh)" -- "${GO_VERSION}"; fi \
+ && if [ -n "${GO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-go.sh)" -- "${GO_VERSION}"; fi \
  && if [ -n "${HUGO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-hugo.sh)" -- "${HUGO_VERSION}"; fi \
  && if [ -n "${KUBECTL_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-kubectl.sh)" -- "${KUBECTL_VERSION}"; fi \
  && if [ -n "${NODE_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-node.sh)" -- "${NODE_VERSION}" "${NPM_HOME}"; fi \
