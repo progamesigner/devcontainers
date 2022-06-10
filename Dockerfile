@@ -30,6 +30,7 @@ ARG NODE_VERSION=none
 ARG PHP_COMPOSER_VERSION=none
 ARG PHP_VERSION=none
 ARG PHP_XDEBUG_VERSION=none
+ARG PULUMI_VERSION=none
 ARG PYPY_PYTHON_VERSION=none
 ARG PYPY_VERSION=none
 ARG PYTHON_VERSION=none
@@ -51,6 +52,7 @@ RUN apt-get update \
  && if [ -n "${KUBECTL_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-kubectl.sh)" -- "${KUBECTL_VERSION}"; fi \
  && if [ -n "${NODE_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-node.sh)" -- "${NODE_VERSION}" "${NPM_HOME}"; fi \
  && if [ -n "${PHP_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-php.sh)" -- "${PHP_VERSION}" "${PHP_COMPOSER_VERSION}" "${PHP_XDEBUG_VERSION}"; fi \
+ && if [ -n "${PULUMI_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-pulumi.sh)" -- "${PULUMI_VERSION}"; fi \
  && if [ -n "${PYPY_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-pypy.sh)" -- "${PYPY_VERSION}" "${PYPY_PYTHON_VERSION}"; fi \
  && if [ -n "${PYTHON_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-python.sh)" -- "${PYTHON_VERSION}"; fi \
  && if [ -n "${RUST_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-rust.sh)" -- "${RUST_VERSION}" "${CARGO_HOME}"; fi \
