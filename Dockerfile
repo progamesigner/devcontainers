@@ -21,6 +21,7 @@ RUN apt-get update \
 
 ARG ACT_VERSION=none
 ARG BUF_VERSION=none
+ARG CRD2PULUMI_VERSION=none
 ARG DOCKER_COMPOSE_VERSION=none
 ARG DOCKER_VERSION=none
 ARG GO_VERSION=none
@@ -45,6 +46,7 @@ ENV PATH=${CARGO_HOME}/bin:${NPM_HOME}/bin:${PATH}
 RUN apt-get update \
  && if [ -n "${ACT_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-act.sh)" -- "${ACT_VERSION}"; fi \
  && if [ -n "${BUF_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-buf.sh)" -- "${BUF_VERSION}"; fi \
+ && if [ -n "${CRD2PULUMI_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-crd2pulumi.sh)" -- "${CRD2PULUMI_VERSION}"; fi \
  && if [ -n "${DOCKER_COMPOSE_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-docker-compose.sh)" -- "${DOCKER_COMPOSE_VERSION}"; fi \
  && if [ -n "${DOCKER_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-docker.sh)" -- "${DOCKER_VERSION}"; fi \
  && if [ -n "${GO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/vscode-dev-containers/${SCRIPT_VERSION}/scripts/setup-go.sh)" -- "${GO_VERSION}"; fi \
