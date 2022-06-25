@@ -51,6 +51,7 @@ PACKAGE_LIST=" \
     tar \
     tzdata \
     vim-tiny \
+    wireguard \
 "
 
 if [[ -n $(apt-cache --names-only search ^libssl3$) ]]; then
