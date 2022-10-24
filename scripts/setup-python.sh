@@ -29,6 +29,7 @@ BUILD_PACKAGES=" \
     libssl-dev \
     lzma-dev \
     make \
+    python3-dev \
     tk-dev \
     uuid-dev \
     xz-utils \
