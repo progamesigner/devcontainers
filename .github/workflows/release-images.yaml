@@ -1,0 +1,50 @@
+name: Release devcontainer images
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - images/**
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+        - ubuntu
+        include:
+        - distro: ubuntu
+          variant: jammy
+    steps:
+    - run: |
+        echo IMAGE_CREATED=$(date --utc +'%Y-%m-%dT%H:%M:%SZ') >> $GITHUB_ENV
+    - uses: actions/checkout@v3
+    - uses: docker/setup-buildx-action@v2
+    - uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: docker/build-push-action@v3
+      with:
+        build-args: |
+          DISTRO=${{ matrix.distro }}
+          VARIANT=${{ matrix.variant }}
+        context: images/${{ matrix.distro }}
+        labels: |
+          org.opencontainers.image.authors=Yang Sheng Han <progamesigner@gmail.com>
+          org.opencontainers.image.created=${{ env.IMAGE_CREATED }}
+          org.opencontainers.image.description=Image for devcontainers
+          org.opencontainers.image.documentation=https://github.com/${{ github.repository }}/images/${{ matrix.distro }}
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          org.opencontainers.image.title=devcontainer/images/${{ matrix.distro }}/${{ matrix.variant }}
+          org.opencontainers.image.url=https://github.com/${{ github.repository }}
+          org.opencontainers.image.vendor=https://github.com/${{ github.repository }}
+          org.opencontainers.image.version=${{ github.sha }}
+        push: true
+        tags: ghcr.io/${{ github.repository }}/images/${{ matrix.distro }}:${{ matrix.variant }}
