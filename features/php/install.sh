@@ -150,7 +150,7 @@ if [[ ${PHP_VERSION} != none ]]; then
     docker-php-source extract
     docker-php-ext-configure gd ${PHP_CONFIGURE_EXTENSIONS}
     docker-php-ext-install gd phar ${PHP_INSTALL_EXTENSIONS}
-    docker-php-ext-enable opcache pdo sodium ${PHP_ENABLE_EXTENSIONS}
+    docker-php-ext-enable opcache sodium ${PHP_ENABLE_EXTENSIONS}
     docker-php-source delete
 
     if [[ ${COMPOSER_VERSION} != none ]]; then
