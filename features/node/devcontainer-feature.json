@@ -1,0 +1,20 @@
+{
+    "id": "node",
+    "version": "1.0.0",
+    "name": "NodeJS",
+    "description": "Install NodeJS",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a NodeJS version to install"
+        }
+    },
+    "containerEnv": {
+        "NPM_HOME": "/usr/local/npm",
+        "PATH": "${NPM_HOME}/bin:${PATH}"
+    }
+}
