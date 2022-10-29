@@ -1,0 +1,27 @@
+{
+    "id": "python",
+    "version": "1.0.0",
+    "name": "Python",
+    "description": "Install Python",
+    "options": {
+        "version": {
+            "type": "string",
+            "enum": [
+                "latest",
+                "3.11",
+                "3.10",
+                "3.9",
+                "3.8",
+                "3.7",
+                "none"
+            ],
+            "default": "none",
+            "description": "Select a Python version to install"
+        },
+        "optimize": {
+            "type": "boolean",
+            "default": false,
+            "description": "Optimize Python for performance when compiled (slow)"
+        }
+    }
+}
