@@ -1,0 +1,23 @@
+name: Release devcontainer features
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - features/**
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: devcontainers/action@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        base-path-to-features: ./features
+        features-namespace: ${{ github.repository }}/features
+        publish-features: 'true'
