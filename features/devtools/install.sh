@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-STEP_VERSION=${1:-none}
+STEP_VERSION=${STEPVERSION:-${1:-none}}
 
 set -e
 

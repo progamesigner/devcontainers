@@ -9,7 +9,7 @@ ARG USER_GID=${USER_UID}
 
 COPY setup.sh /usr/local/bin/setup
 
-RUN /usr/local/bin/setup "${USERNAME}" "${USER_UID}" "${USER_GID}" \
+RUN /usr/local/bin/setup \
  && rm -rf /usr/local/bin/setup
 
 USER ${USERNAME}

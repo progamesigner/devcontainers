@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-USERNAME=${1:-vscode}
-USER_UID=${2:-1000}
-USER_GID=${3:-1000}
+USERNAME=${USERNAME:-${1:-vscode}}
+USER_UID=${USER_UID:-${2:-1000}}
+USER_GID=${USER_GID:-${3:-1000}}
 
 set -e
 

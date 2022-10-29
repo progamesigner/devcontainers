@@ -1,7 +1,7 @@
 {
-    "name": "DevTools",
     "id": "devtools",
     "version": "1.0.0",
+    "name": "DevTools",
     "description": "A set of development tools",
     "options": {
         "stepVersion": {
