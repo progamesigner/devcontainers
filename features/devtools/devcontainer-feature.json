@@ -1,0 +1,16 @@
+{
+    "name": "DevTools",
+    "id": "devtools",
+    "version": "1.0.0",
+    "description": "A set of development tools",
+    "options": {
+        "stepVersion": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a step cli version"
+        }
+    }
+}
