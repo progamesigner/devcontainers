@@ -41,15 +41,14 @@ GPG_KEYS=" \
     E3FF2839C048B25C084DEBE9B26995E310250568 \
     0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D \
     C9B104B3DD3AA72D7CCB1066FB9921286F5E1540 \
-    C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF \
 "
 
 if [[ ${PYTHON_VERSION} != none ]]; then
     echo "Build Python v${PYTHON_VERSION} from source ..."
 
     apt-get update
-    apt-get install --no-install-recommends -y ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends -y
+    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends --yes
 
     curl -sSL -o /tmp/python.tar.xz https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
     curl -sSL -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
@@ -94,6 +93,10 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     ln -s /usr/local/bin/pydoc3 /usr/local/bin/pydoc
     ln -s /usr/local/bin/python3 /usr/local/bin/python
     ln -s /usr/local/bin/python3-config /usr/local/bin/python-config
+
+    apt-get autoremove --yes
+    apt-get clean --yes
+    rm -rf /var/lib/apt/lists/*
 
     echo "Done!"
 fi

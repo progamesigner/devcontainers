@@ -6,17 +6,11 @@
     "options": {
         "version": {
             "type": "string",
-            "enum": [
-                "latest",
-                "3.11",
-                "3.10",
-                "3.9",
-                "3.8",
-                "3.7",
+            "proposals": [
                 "none"
             ],
             "default": "none",
-            "description": "Select a Python version to install"
+            "description": "Select or enter a Python version to install"
         },
         "optimize": {
             "type": "boolean",
