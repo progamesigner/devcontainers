@@ -1,0 +1,32 @@
+{
+    "id": "php",
+    "version": "1.0.0",
+    "name": "PHP",
+    "description": "Install PHP",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a PHP version to install"
+        },
+        "composerVersion": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Composer version to install"
+        },
+        "xdebugVersion": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a XDebug version to install"
+        }
+    }
+}
