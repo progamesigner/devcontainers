@@ -1,0 +1,16 @@
+{
+    "id": "pulumi",
+    "version": "1.0.0",
+    "name": "Pulumi",
+    "description": "Install Pulumi",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Pulumi version to install"
+        }
+    }
+}
