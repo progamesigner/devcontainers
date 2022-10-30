@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 PULUMI_VERSION=${VERSION:-${1:-none}}
+CRD2PULUMI_VERSION=${CRD2PULUMI:-${2:-none}}
 
 set -e
 
@@ -51,6 +52,38 @@ if [[ ${PULUMI_VERSION} != none ]]; then
     cp -v /tmp/pulumi/pulumi-resource-pulumi-python /usr/local/bin/pulumi-resource-pulumi-python
 
     rm -rf /tmp/pulumi /tmp/SHASUMS256.txt /tmp/pulumi.tar.xz
+
+    echo "Done!"
+fi
+
+if [[ ${CRD2PULUMI_VERSION} != none ]]; then
+    echo "Setup CRD2Pulumi v${CRD2PULUMI_VERSION} ..."
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    if [[ ${CRD2PULUMI_VERSION} = latest ]]; then
+        CRD2PULUMI_VERSION=$(curl -sSL https://api.github.com/repos/pulumi/crd2pulumi/releases/latest | jq -r ".tag_name")
+    fi
+
+    if [[ ${CRD2PULUMI_VERSION} != v* ]]; then
+        CRD2PULUMI_VERSION=v${CRD2PULUMI_VERSION}
+    fi
+
+    curl -sSL -o /tmp/crd2pulumi.tar.gz https://github.com/pulumi/crd2pulumi/releases/download/${CRD2PULUMI_VERSION}/crd2pulumi-${CRD2PULUMI_VERSION}-linux-${ARCHITECTURE}.tar.gz
+    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/pulumi/crd2pulumi/releases/download/${CRD2PULUMI_VERSION}/checksums.txt
+
+    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/crd2pulumi.tar.gz | cut -d ' ' -f 1)"
+
+    mkdir -p /tmp/crd2pulumi
+    tar -xz -f /tmp/crd2pulumi.tar.gz -C /tmp/crd2pulumi
+    cp -v /tmp/crd2pulumi/crd2pulumi /usr/local/bin/crd2pulumi
+
+    rm -rf /tmp/crd2pulumi /tmp/SHASUMS256.txt /tmp/crd2pulumi.tar.gz
 
     echo "Done!"
 fi

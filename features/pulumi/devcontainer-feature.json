@@ -11,6 +11,14 @@
             ],
             "default": "none",
             "description": "Select or enter a Pulumi version to install"
+        },
+        "crd2pulumi": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a crd2pulumi version to install"
         }
     }
 }
