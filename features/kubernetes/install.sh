@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KUBECTL_VERSION=${VERSION:-${1:-none}}
+KUBECTL_VERSION=${KUBECTL:-${1:-none}}
 
 KUBECTL_SHA256=${KUBECTL_SHA256:-automatic}
 

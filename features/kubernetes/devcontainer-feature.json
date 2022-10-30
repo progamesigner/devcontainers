@@ -1,10 +1,10 @@
 {
-    "id": "kubectl",
+    "id": "kubernetes",
     "version": "1.0.0",
-    "name": "Kubernetes Client",
-    "description": "Install kubectl",
+    "name": "Kubernetes",
+    "description": "Install Kubernetes",
     "options": {
-        "version": {
+        "kubectl": {
             "type": "string",
             "proposals": [
                 "none"
