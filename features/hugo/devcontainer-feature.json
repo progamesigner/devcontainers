@@ -1,0 +1,16 @@
+{
+    "id": "hugo",
+    "version": "1.0.0",
+    "name": "Hugo",
+    "description": "Install Hugo",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Hugo version to install"
+        }
+    }
+}
