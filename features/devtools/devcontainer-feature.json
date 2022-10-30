@@ -1,16 +1,32 @@
 {
     "id": "devtools",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
-        "stepVersion": {
+        "act": {
             "type": "string",
             "proposals": [
                 "none"
             ],
             "default": "none",
-            "description": "Select or enter a step cli version"
+            "description": "Select or enter a act version"
+        },
+        "buf": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a buf version"
+        },
+        "step": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a step version"
         }
     }
 }
