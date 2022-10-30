@@ -1,0 +1,29 @@
+{
+	"name": "DevContainers",
+	"image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:jammy",
+	"features": {
+		"ghcr.io/progamesigner/devcontainers/features/node:latest": {
+			"version": "18.12.0"
+		},
+		"ghcr.io/progamesigner/devcontainers/features/docker:latest": {
+			"version": "20.10.20"
+		}
+	},
+	"containerEnv": {
+		"DOCKER_CERT_PATH": "/etc/docker",
+		"DOCKER_HOST": "tcp://docker.progamesigner.com:2376",
+		"DOCKER_TLS_VERIFY": "1"
+	},
+	"mounts": [
+		"source=dev-vscode-docker,target=/etc/docker,type=volume,readonly"
+	],
+	"workspaceMount": "source=/srv/syncthing/codespaces/progamesigner/vscode-dev-containers,target=/workspaces/vscode-dev-containers,type=bind,consistency=cached",
+	"workspaceFolder": "/workspaces/vscode-dev-containers",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"mads-hartmann.bash-ide-vscode"
+			]
+		}
+	}
+}
