@@ -1,0 +1,27 @@
+{
+    "id": "go",
+    "version": "1.0.0",
+    "name": "Go",
+    "description": "Install Go",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Go version to install"
+        }
+    },
+    "containerEnv": {
+        "GOPATH": "/opt/go",
+        "GOROOT": "/usr/local/go",
+        "PATH": "${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+    },
+    "capAdd": [
+        "SYS_PTRACE"
+    ],
+    "securityOpt": [
+        "seccomp=unconfined"
+    ]
+}
