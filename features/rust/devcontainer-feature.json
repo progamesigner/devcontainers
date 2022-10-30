@@ -1,0 +1,26 @@
+{
+    "id": "rust",
+    "version": "1.0.0",
+    "name": "Rust",
+    "description": "Install Rust",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Rust version to install"
+        }
+    },
+    "containerEnv": {
+        "CARGO_HOME": "/usr/local/cargo",
+        "PATH": "${CARGO_HOME}/bin:${PATH}"
+    },
+    "capAdd": [
+        "SYS_PTRACE"
+    ],
+    "securityOpt": [
+        "seccomp=unconfined"
+    ]
+}
