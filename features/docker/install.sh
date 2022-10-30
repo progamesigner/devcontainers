@@ -66,11 +66,11 @@ if [[ ${DOCKER_COMPOSE_VERSION} != none ]]; then
         DOCKER_COMPOSE_VERSION=$(curl -sSL https://api.github.com/repos/docker/compose/releases/latest | jq -r ".tag_name")
     fi
 
-    curl -sSL -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)
+    curl -sSL -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)
     chmod +x /usr/local/bin/docker-compose
 
     if [[ ${DOCKER_COMPOSE_SHA256} = automatic ]]; then
-        DOCKER_COMPOSE_SHA256=$(curl -sSL https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m).sha256)
+        DOCKER_COMPOSE_SHA256=$(curl -sSL https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m).sha256)
     fi
 
     if [[ ${DOCKER_COMPOSE_SHA256} != skip ]]; then

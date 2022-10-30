@@ -1,6 +1,6 @@
 {
     "id": "docker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Docker Client & Docker Compose",
     "description": "Install Docker Client & Docker Compose",
     "options": {
