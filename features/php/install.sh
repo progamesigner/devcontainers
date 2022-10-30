@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 PHP_VERSION=${VERSION:-${1:-none}}
-COMPOSER_VERSION=${COMPOSERVERSION:-${2:-none}}
-XDEBUG_VERSION=${XDEBUGVERSION:-${3:-none}}
+COMPOSER_VERSION=${COMPOSER:-${2:-none}}
+XDEBUG_VERSION=${XDEBUG:-${3:-none}}
 
 PHP_INI_DIR=${PHP_INI_DIR:-/usr/local/etc/php}
 COMPOSER_SHA256=${COMPOSER_SHA256:-automatic}

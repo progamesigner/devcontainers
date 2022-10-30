@@ -12,7 +12,7 @@
             "default": "none",
             "description": "Select or enter a docker client version to install"
         },
-        "composeVersion": {
+        "compose": {
             "type": "string",
             "proposals": [
                 "none"
