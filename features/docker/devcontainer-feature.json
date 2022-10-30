@@ -1,0 +1,24 @@
+{
+    "id": "docker",
+    "version": "1.0.0",
+    "name": "Docker Client & Docker Compose",
+    "description": "Install Docker Client & Docker Compose",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a docker client version to install"
+        },
+        "composeVersion": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a docker-compose version to install"
+        }
+    }
+}
