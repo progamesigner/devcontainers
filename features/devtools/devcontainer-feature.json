@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -28,9 +28,6 @@
             "default": "none",
             "description": "Select or enter a step version"
         }
-    },
-    "containerEnv": {
-        "DEV_SETUP_PATH": "${containerWorkspaceFolder}/setup.sh"
     },
     "entrypoint": "/usr/local/share/devtools-init.sh"
 }

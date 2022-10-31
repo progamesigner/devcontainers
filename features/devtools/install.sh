@@ -169,9 +169,9 @@ execute() {
     fi
 }
 
-if [ -f ${DEV_SETUP_PATH}/.devcontainer.sh ]; then
+if [ -f ${DEV_SETUP_PATH} ]; then
     execute apt-get update
-    execute bash -c ${DEV_SETUP_PATH}/.devcontainer.sh -- ${DEV_SETUP_ARGS}
+    execute bash -c ${DEV_SETUP_PATH} -- ${DEV_SETUP_ARGS}
     execute apt-get autoremove --yes
     execute apt-get clean --yes
     execute rm -rf /var/lib/apt/lists/*
