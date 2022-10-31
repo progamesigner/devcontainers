@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -28,5 +28,6 @@
             "default": "none",
             "description": "Select or enter a step version"
         }
-    }
+    },
+    "entrypoint": "/usr/local/share/devtools-init.sh"
 }

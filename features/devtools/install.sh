@@ -156,6 +156,30 @@ if [[ ${STEP_VERSION} != none ]]; then
     rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.gz
 fi
 
+echo "$(cat << 'EOF'
+#!/bin/sh
+
+set -e
+
+execute() {
+    if [ "$(id -u)" -ne 0 ]; then
+        sudo "$@"
+    else
+        "$@"
+    fi
+}
+
+if [ -f ${DEV_SETUP_PATH}/.devcontainer.sh ]; then
+    execute apt-get update
+    execute bash -c ${DEV_SETUP_PATH}/.devcontainer.sh -- ${DEV_SETUP_ARGS}
+    execute apt-get autoremove --yes
+    execute apt-get clean --yes
+    execute rm -rf /var/lib/apt/lists/*
+fi
+EOF
+)" > /usr/local/share/devtools-init.sh
+chmod +x /usr/local/share/devtools-init.sh
+
 apt-get autoremove --yes
 apt-get clean --yes
 rm -rf /var/lib/apt/lists/*
