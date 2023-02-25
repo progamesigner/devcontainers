@@ -9,7 +9,9 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=${USER_UID}
 
+ARG ENABLE_DEBUG_TOOLS=true
 ARG ENABLE_DEVTOOLS=true
+ARG ENABLE_SSH_SERVER=true
 
 ARG ACT_VERSION=none
 ARG BUF_VERSION=none
@@ -24,6 +26,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 ARG CRD2PULUMI_VERSION=none
+ARG DENO_VERSION=none
 ARG DOCKER_COMPOSE_VERSION=none
 ARG DOCKER_VERSION=none
 ARG GO_VERSION=none
@@ -45,6 +48,7 @@ ENV NPM_HOME=/usr/local/npm
 ENV PATH=${CARGO_HOME}/bin:${GOROOT}/bin:${GOPATH}/bin:${NPM_HOME}/bin:${PATH}
 
 RUN apt-get update \
+ && if [ -n "${DENO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/devcontainers/${SCRIPT_VERSION}/features/deno/install.sh)" -- "${DENO_VERSION}"; fi \
  && if [ -n "${DOCKER_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/devcontainers/${SCRIPT_VERSION}/features/docker/install.sh)" -- "${DOCKER_VERSION}" "${DOCKER_COMPOSE_VERSION}"; fi \
  && if [ -n "${GO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/devcontainers/${SCRIPT_VERSION}/features/go/install.sh)" -- "${GO_VERSION}"; fi \
  && if [ -n "${HUGO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/devcontainers/${SCRIPT_VERSION}/features/hugo/install.sh)" -- "${HUGO_VERSION}"; fi \
