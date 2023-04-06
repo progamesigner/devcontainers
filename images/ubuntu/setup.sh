@@ -52,6 +52,7 @@ PACKAGE_LIST=" \
     tzdata \
     vim-tiny \
     wireguard \
+    zsh \
 "
 
 if [[ -n $(apt-cache --names-only search ^libssl3$) ]]; then
@@ -118,48 +119,54 @@ chmod +x /usr/local/bin/systemctl
 
 # Configure shell
 SHELL_RC_SNIPPET="$(cat << 'EOF'
-if [[ -z ${USER} ]]; then export USER=$(whoami); fi
-if [[ ${PATH} != *${HOME}/.local/bin* ]]; then export PATH=${PATH}:${HOME}/.local/bin; fi
+
+if [ -z "${USER}" ]; then export USER=$(whoami); fi
+if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi
 
 # Display optional first run image specific notice if configured and terminal is interactive
-if [[ -t 1 && (${TERM_PROGRAM} = vscode || ${TERM_PROGRAM} = codespaces) && ! -f ${HOME}/.config/devcontainers/first-run-notice-already-displayed ]]; then
-    if [[ -f /usr/local/etc/devcontainers/first-run-notice.txt ]]; then
-        cat /usr/local/etc/devcontainers/first-run-notice.txt
-    elif [[ -f /usr/local/etc/vscode-dev-containers/first-run-notice.txt ]]; then
-        cat /usr/local/etc/vscode-dev-containers/first-run-notice.txt
-    elif [[ -f /workspaces/.codespaces/shared/first-run-notice.txt ]]; then
-        cat /workspaces/.codespaces/shared/first-run-notice.txt
+if [ -t 1 ] && [[ "${TERM_PROGRAM}" = "vscode" || "${TERM_PROGRAM}" = "codespaces" ]] && [ ! -f "$HOME/.config/vscode-dev-containers/first-run-notice-already-displayed" ]; then
+    if [ -f "/usr/local/etc/vscode-dev-containers/first-run-notice.txt" ]; then
+        cat "/usr/local/etc/vscode-dev-containers/first-run-notice.txt"
+    elif [ -f "/workspaces/.codespaces/shared/first-run-notice.txt" ]; then
+        cat "/workspaces/.codespaces/shared/first-run-notice.txt"
     fi
-    mkdir -p ${HOME}/.config/devcontainers
-    ((sleep 3s; touch ${HOME}/.config/devcontainers/first-run-notice-already-displayed) &)
+    mkdir -p "$HOME/.config/vscode-dev-containers"
+    # Mark first run notice as displayed after 10s to avoid problems with fast terminal refreshes hiding it
+    ((sleep 10s; touch "$HOME/.config/vscode-dev-containers/first-run-notice-already-displayed") &)
 fi
 
-# Set the default git editor
-if [[ ${TERM_PROGRAM} = vscode ]]; then
-    if [[ -n $(command -v code-insiders) && -z $(command -v code) ]]; then
-        export GIT_EDITOR="code-insiders --wait"
-    else
-        export GIT_EDITOR="code --wait"
+# Set the default git editor if not already set
+if [ -z "$(git config --get core.editor)" ] && [ -z "${GIT_EDITOR}" ]; then
+    if  [ "${TERM_PROGRAM}" = "vscode" ]; then
+        if [[ -n $(command -v code-insiders) &&  -z $(command -v code) ]]; then
+            export GIT_EDITOR="code-insiders --wait"
+        else
+            export GIT_EDITOR="code --wait"
+        fi
     fi
 fi
+
 EOF
 )"
 
-USER_RC_SNIPPET="$(cat \
-<<'EOF'
+USER_RC_SNIPPET="$(cat <<'EOF'
+
 # Codespaces bash prompt theme
 __bash_prompt() {
     local userpart='`export XIT=$? \
-        && test -n ${GITHUB_USER} && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
-        && test ${XIT} -ne 0 && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
+        && [ ! -z "${GITHUB_USER}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
+        && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
     local gitbranch='`\
-        export BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null); \
-        if [[ -n ${BRANCH} ]]; then \
-            echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH}" \
-            && if git ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
-                    echo -n " \[\033[1;33m\]✗"; \
-               fi \
-            && echo -n "\[\033[0;36m\]) "; \
+        if [ "$(git config --get devcontainers-theme.hide-status 2>/dev/null)" != 1 ] && [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" != 1 ]; then \
+            export BRANCH=$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null); \
+            if [ "${BRANCH}" != "" ]; then \
+                echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH}" \
+                && if [ "$(git config --get devcontainers-theme.show-dirty 2>/dev/null)" = 1 ] && \
+                    git --no-optional-locks ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
+                        echo -n " \[\033[1;33m\]✗"; \
+                fi \
+                && echo -n "\[\033[0;36m\]) "; \
+            fi; \
         fi`'
     local lightblue='\[\033[1;34m\]'
     local removecolor='\[\033[0m\]'
@@ -167,6 +174,8 @@ __bash_prompt() {
     unset -f __bash_prompt
 }
 __bash_prompt
+export PROMPT_DIRTRIM=4
+
 EOF
 )"
 
@@ -185,6 +194,7 @@ if [[ ! -f ${USER_RC_PATH}/.profile || ! -s ${USER_RC_PATH}/.profile ]]; then
 fi
 
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
+echo "${SHELL_RC_SNIPPET}" >> /etc/zsh/zshrc
 echo "${USER_RC_SNIPPET}" >> ${USER_RC_PATH}/.bashrc
 echo 'export PROMPT_DIRTRIM=4' >> ${USER_RC_PATH}/.bashrc
 if [[ ${USERNAME} != root ]]; then
