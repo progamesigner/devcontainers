@@ -182,7 +182,7 @@ execute() {
     fi
 }
 
-if [ -f ${CLOUDFLARE_TUNNEL_TOKEN} ]; then
+if [ -n "$(command -v cloudflared)" ] && [ -n "${CLOUDFLARE_TUNNEL_TOKEN}" ]; then
     execute cloudflared service install -- ${CLOUDFLARE_TUNNEL_TOKEN}
 fi
 
