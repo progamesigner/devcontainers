@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -19,6 +19,14 @@
             ],
             "default": "none",
             "description": "Select or enter a buf version"
+        },
+        "cloudflared": {
+            "type": "string",
+            "proposals": [
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a cloudflared version"
         },
         "step": {
             "type": "string",

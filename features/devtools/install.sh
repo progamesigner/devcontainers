@@ -2,6 +2,7 @@
 
 ACT_VERSION=${ACT:-none}
 BUF_VERSION=${BUF:-none}
+CLOUDFLARED_VERSION=${CLOUDFLARED:-none}
 STEP_VERSION=${STEP:-none}
 
 BUF_SHA256=${BUF_SHA256:-automatic}
@@ -139,6 +140,18 @@ if [[ ${BUF_VERSION} != none ]]; then
     chmod +x /usr/local/bin/protoc-gen-buf-lint
 
     rm -rf /tmp/buf /tmp/protoc-gen-buf-breaking /tmp/protoc-gen-buf-lint /tmp/SHASUMS256.txt
+fi
+
+if [[ ${CLOUDFLARED_VERSION} != none ]]; then
+    echo "Setup cloudflared v${CLOUDFLARED_VERSION} ..."
+
+    curl -sSL -o /tmp/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+
+    cp -v /tmp/cloudflared /usr/local/bin/cloudflared
+
+    chmod +x /usr/local/bin/cloudflared
+
+    rm -rf /tmp/cloudflared
 fi
 
 if [[ ${STEP_VERSION} != none ]]; then
