@@ -182,6 +182,10 @@ execute() {
     fi
 }
 
+if [ -f ${CLOUDFLARE_TUNNEL_TOKEN} ]; then
+    execute cloudflared service install -- ${CLOUDFLARE_TUNNEL_TOKEN}
+fi
+
 if [ -f ${DEV_SETUP_PATH} ]; then
     execute apt-get update
     execute bash -c ${DEV_SETUP_PATH} -- ${DEV_SETUP_ARGS}
