@@ -93,15 +93,15 @@ if [[ ${ACT_VERSION} != none ]]; then
     fi
 
     curl -sSL -o /tmp/act.tar.gz https://github.com/nektos/act/releases/download/${ACT_VERSION}/act_Linux_${ARCHITECTURE}.tar.gz
-    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/nektos/act/releases/download/${ACT_VERSION}/checksums.txt
+    curl -sSL -o /tmp/act.tar.gz.asc https://github.com/nektos/act/releases/download/${ACT_VERSION}/checksums.txt
 
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/act.tar.gz | cut -d ' ' -f 1)"
+    cat /tmp/act.tar.gz.asc | grep "$(sha256sum /tmp/act.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/act
     tar -xz -f /tmp/act.tar.gz -C /tmp/act
     cp -v /tmp/act/act /usr/local/bin/act
 
-    rm -rf /tmp/act /tmp/SHASUMS256.txt /tmp/act.tar.xz
+    rm -rf /tmp/act /tmp/act.tar.gz.asc /tmp/act.tar.xz
 fi
 
 if [[ ${BUF_VERSION} != none ]]; then
@@ -125,11 +125,11 @@ if [[ ${BUF_VERSION} != none ]]; then
     curl -sSL -o /tmp/buf https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/buf-Linux-${ARCHITECTURE}
     curl -sSL -o /tmp/protoc-gen-buf-breaking https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/protoc-gen-buf-breaking-Linux-${ARCHITECTURE}
     curl -sSL -o /tmp/protoc-gen-buf-lint https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/protoc-gen-buf-lint-Linux-${ARCHITECTURE}
-    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/sha256.txt
+    curl -sSL -o /tmp/SHASUMS256.txt.asc https://github.com/bufbuild/buf/releases/download/${BUF_VERSION}/sha256.txt
 
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/buf | cut -d ' ' -f 1)"
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/protoc-gen-buf-breaking | cut -d ' ' -f 1)"
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/protoc-gen-buf-lint | cut -d ' ' -f 1)"
+    cat /tmp/SHASUMS256.txt.asc | grep "$(sha256sum /tmp/buf | cut -d ' ' -f 1)"
+    cat /tmp/SHASUMS256.txt.asc | grep "$(sha256sum /tmp/protoc-gen-buf-breaking | cut -d ' ' -f 1)"
+    cat /tmp/SHASUMS256.txt.asc | grep "$(sha256sum /tmp/protoc-gen-buf-lint | cut -d ' ' -f 1)"
 
     cp -v /tmp/buf /usr/local/bin/buf
     cp -v /tmp/protoc-gen-buf-breaking /usr/local/bin/protoc-gen-buf-breaking
@@ -158,15 +158,15 @@ if [[ ${STEP_VERSION} != none ]]; then
     echo "Setup step v${STEP_VERSION} ..."
 
     curl -sSL -o /tmp/step-cli.tar.gz https://github.com/smallstep/cli/releases/download/v${STEP_VERSION}/step_linux_${STEP_VERSION}_${ARCHITECTURE}.tar.gz
-    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/smallstep/cli/releases/download/v${STEP_VERSION}/checksums.txt
+    curl -sSL -o /tmp/step-cli.tar.gz.asc https://github.com/smallstep/cli/releases/download/v${STEP_VERSION}/checksums.txt
 
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/step-cli.tar.gz | cut -d ' ' -f 1)"
+    cat /tmp/step-cli.tar.gz.asc | grep "$(sha256sum /tmp/step-cli.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/step-cli
     tar -xz -f /tmp/step-cli.tar.gz -C /tmp/step-cli --strip-components=1
     cp -v /tmp/step-cli/bin/step /usr/local/bin/step
 
-    rm -rf /tmp/step-cli /tmp/SHASUMS256.txt /tmp/step-cli.tar.gz
+    rm -rf /tmp/step-cli /tmp/step-cli.tar.gz.asc /tmp/step-cli.tar.gz
 fi
 
 echo "$(cat << 'EOF'

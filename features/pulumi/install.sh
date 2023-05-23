@@ -32,9 +32,9 @@ if [[ ${PULUMI_VERSION} != none ]]; then
     fi
 
     curl -sSL -o /tmp/pulumi.tar.gz https://get.pulumi.com/releases/sdk/pulumi-${PULUMI_VERSION}-linux-${ARCHITECTURE}.tar.gz
-    curl -sSL -o /tmp/SHASUMS256.txt https://get.pulumi.com/releases/sdk/pulumi-${PULUMI_VERSION#v}-checksums.txt
+    curl -sSL -o /tmp/pulumi.tar.gz.asc https://get.pulumi.com/releases/sdk/pulumi-${PULUMI_VERSION#v}-checksums.txt
 
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/pulumi.tar.gz | cut -d ' ' -f 1)"
+    cat /tmp/pulumi.tar.gz.asc | grep "$(sha256sum /tmp/pulumi.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/pulumi
     tar -xz -f /tmp/pulumi.tar.gz -C /tmp/pulumi --strip-components=1
@@ -51,7 +51,7 @@ if [[ ${PULUMI_VERSION} != none ]]; then
     cp -v /tmp/pulumi/pulumi-resource-pulumi-nodejs /usr/local/bin/pulumi-resource-pulumi-nodejs
     cp -v /tmp/pulumi/pulumi-resource-pulumi-python /usr/local/bin/pulumi-resource-pulumi-python
 
-    rm -rf /tmp/pulumi /tmp/SHASUMS256.txt /tmp/pulumi.tar.xz
+    rm -rf /tmp/pulumi /tmp/pulumi.tar.gz.asc /tmp/pulumi.tar.xz
 
     echo "Done!"
 fi
@@ -75,15 +75,15 @@ if [[ ${CRD2PULUMI_VERSION} != none ]]; then
     fi
 
     curl -sSL -o /tmp/crd2pulumi.tar.gz https://github.com/pulumi/crd2pulumi/releases/download/${CRD2PULUMI_VERSION}/crd2pulumi-${CRD2PULUMI_VERSION}-linux-${ARCHITECTURE}.tar.gz
-    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/pulumi/crd2pulumi/releases/download/${CRD2PULUMI_VERSION}/checksums.txt
+    curl -sSL -o /tmp/crd2pulumi.tar.gz.asc https://github.com/pulumi/crd2pulumi/releases/download/${CRD2PULUMI_VERSION}/checksums.txt
 
-    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/crd2pulumi.tar.gz | cut -d ' ' -f 1)"
+    cat /tmp/crd2pulumi.tar.gz.asc | grep "$(sha256sum /tmp/crd2pulumi.tar.gz | cut -d ' ' -f 1)"
 
     mkdir -p /tmp/crd2pulumi
     tar -xz -f /tmp/crd2pulumi.tar.gz -C /tmp/crd2pulumi
     cp -v /tmp/crd2pulumi/crd2pulumi /usr/local/bin/crd2pulumi
 
-    rm -rf /tmp/crd2pulumi /tmp/SHASUMS256.txt /tmp/crd2pulumi.tar.gz
+    rm -rf /tmp/crd2pulumi /tmp/crd2pulumi.tar.gz.asc /tmp/crd2pulumi.tar.gz
 
     echo "Done!"
 fi
