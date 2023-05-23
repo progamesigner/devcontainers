@@ -1,16 +1,26 @@
 {
     "id": "kubernetes",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Kubernetes",
     "description": "Install Kubernetes",
     "options": {
         "kubectl": {
             "type": "string",
             "proposals": [
-                "none"
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a kubectl version to install"
+        },
+        "helm": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
             ],
             "default": "none",
-            "description": "Select or enter a kubectl version to install"
+            "description": "Select or enter a Helm version to install"
         }
     }
 }
