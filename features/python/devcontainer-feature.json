@@ -1,6 +1,6 @@
 {
     "id": "python",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Python",
     "description": "Install Python",
     "options": {
@@ -17,5 +17,14 @@
             "default": false,
             "description": "Optimize Python for performance when compiled (slow)"
         }
-    }
+    },
+	"customizations": {
+		"vscode": {
+			"extensions": [
+                "magicstack.magicpython",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+			]
+		}
+	}
 }

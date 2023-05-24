@@ -1,6 +1,6 @@
 {
     "id": "node",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "NodeJS",
     "description": "Install NodeJS",
     "options": {
@@ -16,5 +16,13 @@
     "containerEnv": {
         "NPM_HOME": "/usr/local/npm",
         "PATH": "${NPM_HOME}/bin:${PATH}"
-    }
+    },
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode"
+			]
+		}
+	}
 }
