@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -23,9 +23,10 @@
         "cloudflared": {
             "type": "string",
             "proposals": [
+                "none",
                 "latest"
             ],
-            "default": "latest",
+            "default": "none",
             "description": "Select or enter a cloudflared version"
         },
         "step": {
@@ -35,6 +36,15 @@
             ],
             "default": "none",
             "description": "Select or enter a step version"
+        },
+        "tailscale": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "none",
+            "description": "Select or enter a tailscale version"
         }
     },
     "entrypoint": "/usr/local/share/devtools-init.sh"

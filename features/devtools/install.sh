@@ -4,6 +4,7 @@ ACT_VERSION=${ACT:-none}
 BUF_VERSION=${BUF:-none}
 CLOUDFLARED_VERSION=${CLOUDFLARED:-none}
 STEP_VERSION=${STEP:-none}
+TAILSCALE_VERSION=${TAILSCALE:-none}
 
 BUF_SHA256=${BUF_SHA256:-automatic}
 
@@ -169,6 +170,31 @@ if [[ ${STEP_VERSION} != none ]]; then
     rm -rf /tmp/step-cli /tmp/step-cli.tar.gz.asc /tmp/step-cli.tar.gz
 fi
 
+if [[ ${TAILSCALE_VERSION} != none ]]; then
+    echo "Setup tailscale v${TAILSCALE_VERSION} ..."
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        armhf) ARCHITECTURE=arm;;
+        i386) ARCHITECTURE=386;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    curl -sSL -o /tmp/tailscale.tar.gz https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSION}_${ARCHITECTURE}.tgz
+
+    mkdir -p /tmp/tailscale
+    tar -xz -f /tmp/tailscale.tar.gz -C /tmp/tailscale --strip-components=1
+    cp -v /tmp/tailscale/tailscale /usr/local/bin/tailscale
+    cp -v /tmp/tailscale/tailscaled /usr/local/bin/tailscaled
+
+    mkdir -p /var/lib/tailscale
+    mkdir -p /var/run/tailscale
+
+    rm -rf /tmp/tailscale /tmp/tailscale.tar.gz
+fi
+
 echo "$(cat << 'EOF'
 #!/bin/sh
 
@@ -184,6 +210,22 @@ execute() {
 
 if [ -n "$(command -v cloudflared)" ] && [ -n "${CLOUDFLARE_TUNNEL_TOKEN}" ]; then
     execute cloudflared service install -- ${CLOUDFLARE_TUNNEL_TOKEN}
+fi
+
+if [ -n "$(command -v tailscaled)" ]; then
+    execute tailscaled \
+        --port=41641 \
+        --socket=/var/run/tailscale/tailscaled.sock \
+        --state=/var/lib/tailscale/tailscaled.state \
+        --tun=userspace-networking
+fi
+
+if [ -n "$(command -v tailscale)" ] && [ -n "${TS_AUTHKEY}" ]; then
+    execute tailscale up \
+        --accept-dns=true \
+        --accept-routes=true \
+        --advertise-routes=${TS_ROUTES} \
+        --authkey=${TS_AUTHKEY}
 fi
 
 if [ -f ${DEV_SETUP_PATH} ]; then
