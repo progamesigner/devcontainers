@@ -1,0 +1,24 @@
+{
+    "id": "gcloud-cli",
+    "version": "1.0.0",
+    "name": "Google Cloud Cli",
+    "description": "Install Google Cloud Cli",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Google Cloud Cli version to install"
+        },
+        "components": {
+            "type": "string",
+            "default": "",
+            "description": "Enter a Google Cloud Cli components to install, separated by spaces"
+        }
+    },
+    "containerEnv": {
+        "PATH": "/usr/local/share/gcloud-cli/bin:${PATH}"
+    }
+}
