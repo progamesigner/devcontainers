@@ -15,11 +15,19 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
+BUILD_PACKAGES=" \
+    unzip \
+"
+
 ANDROID_COMPONENTS="build-tools;${BUILD_TOOLS_VERSION},cmdline-tools;latest,emulator,platform-tools,platforms;android-${PLATFORM_VERSION},${EXTRA_COMPONENTS}"
 SDKMANAGER="/tmp/android/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android"
 
 if [[ ${PLATFORM_VERSION} != none ]] && [[ ${BUILD_TOOLS_VERSION} != none ]]; then
     echo "Setup Android v${PLATFORM_VERSION} and build tools v${BUILD_TOOLS_VERSION} ..."
+
+    apt-get update
+    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends --yes
 
     curl -sSL -o /tmp/android.zip https://dl.google.com/android/repository/commandlinetools-linux-${COMMANDLINE_VERSION}_latest.zip
 
@@ -31,6 +39,10 @@ if [[ ${PLATFORM_VERSION} != none ]] && [[ ${BUILD_TOOLS_VERSION} != none ]]; th
     ${SDKMANAGER[@]} --install ${components[@]}
 
     rm -rf /tmp/android /tmp/android.zip
+
+    apt-get autoremove --yes
+    apt-get clean --yes
+    rm -rf /var/lib/apt/lists/*
 
     echo "Done!"
 fi

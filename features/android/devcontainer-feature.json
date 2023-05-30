@@ -1,6 +1,6 @@
 {
     "id": "android",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Android",
     "description": "Install Android development environment",
     "options": {
