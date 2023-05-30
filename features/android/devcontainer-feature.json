@@ -1,0 +1,41 @@
+{
+    "id": "android",
+    "version": "1.0.0",
+    "name": "Android",
+    "description": "Install Android development environment",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Android Platform version to install"
+        },
+        "build": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Android Build Tools version to install"
+        },
+        "components": {
+            "type": "string",
+            "default": "",
+            "description": "Enter extra components to install"
+        },
+        "commandline": {
+            "type": "string",
+            "default": "9477386",
+            "description": "Enter Android command-line tools version to install"
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/progamesigner/devcontainers/features/java"
+    ],
+    "containerEnv": {
+        "ANDROID_SDK_ROOT": "/opt/android",
+        "PATH": "${PATH}:/opt/android/cmdline-tools/latest/bin:/opt/android/platform-tools:/opt/android/emulator"
+    }
+}
