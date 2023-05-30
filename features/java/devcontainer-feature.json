@@ -1,0 +1,20 @@
+{
+    "id": "java",
+    "version": "1.0.0",
+    "name": "Java",
+    "description": "Install Java",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Java (JDK) version to install"
+        }
+    },
+    "containerEnv": {
+        "JAVA_HOME": "/opt/java/temurin",
+        "PATH": "/opt/java/temurin/bin:${PATH}"
+    }
+}
