@@ -1,0 +1,29 @@
+{
+    "id": "flutter",
+    "version": "1.0.0",
+    "name": "Flutter",
+    "description": "Install Flutter",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Flutter version to install"
+        },
+        "channel": {
+            "type": "string",
+            "proposals": [
+                "stable",
+                "beta"
+            ],
+            "default": "stable",
+            "description": "Select or enter a Flutter version to install"
+        }
+    },
+    "containerEnv": {
+        "FLUTTER_WEB": "enable",
+        "PATH": "${PATH}:/opt/flutter/bin"
+    }
+}
