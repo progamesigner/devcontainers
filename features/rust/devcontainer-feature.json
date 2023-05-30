@@ -15,7 +15,7 @@
     },
     "containerEnv": {
         "CARGO_HOME": "/usr/local/cargo",
-        "PATH": "${CARGO_HOME}/bin:${PATH}"
+        "PATH": "${PATH}:${CARGO_HOME}/bin"
     },
     "capAdd": [
         "SYS_PTRACE"

@@ -16,7 +16,7 @@
     "containerEnv": {
         "GOPATH": "/opt/go",
         "GOROOT": "/usr/local/go",
-        "PATH": "${GOROOT}/bin:${GOPATH}/bin:${PATH}"
+        "PATH": "${PATH}:${GOROOT}/bin:${GOPATH}/bin"
     },
     "capAdd": [
         "SYS_PTRACE"

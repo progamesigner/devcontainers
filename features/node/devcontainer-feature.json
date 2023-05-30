@@ -15,7 +15,7 @@
     },
     "containerEnv": {
         "NPM_HOME": "/usr/local/npm",
-        "PATH": "${NPM_HOME}/bin:${PATH}"
+        "PATH": "${PATH}:${NPM_HOME}/bin"
     },
 	"customizations": {
 		"vscode": {

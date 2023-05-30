@@ -45,7 +45,7 @@ ENV GOPATH=/opt/go
 ENV GOROOT=/usr/local/go
 ENV NPM_HOME=/usr/local/npm
 
-ENV PATH=${CARGO_HOME}/bin:${GOROOT}/bin:${GOPATH}/bin:${NPM_HOME}/bin:${PATH}
+ENV PATH=${PATH}:${CARGO_HOME}/bin:${GOROOT}/bin:${GOPATH}/bin:${NPM_HOME}/bin
 
 RUN apt-get update \
  && if [ -n "${DENO_VERSION}" ]; then bash -c "$(curl -fsSL https://raw.githubusercontent.com/progamesigner/devcontainers/${SCRIPT_VERSION}/features/deno/install.sh)" -- "${DENO_VERSION}"; fi \

@@ -19,6 +19,6 @@
         }
     },
     "containerEnv": {
-        "PATH": "/usr/local/share/gcloud-cli/bin:${PATH}"
+        "PATH": "${PATH}:/usr/local/share/gcloud-cli/bin"
     }
 }
