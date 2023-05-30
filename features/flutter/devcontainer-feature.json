@@ -1,6 +1,6 @@
 {
     "id": "flutter",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Flutter",
     "description": "Install Flutter",
     "options": {
@@ -22,6 +22,9 @@
             "description": "Select or enter a Flutter version to install"
         }
     },
+    "installsAfter": [
+        "ghcr.io/progamesigner/devcontainers/features/android"
+    ],
     "containerEnv": {
         "FLUTTER_WEB": "enable",
         "PATH": "${PATH}:/opt/flutter/bin"
