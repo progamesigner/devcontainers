@@ -15,8 +15,10 @@ if [[ $(id -u) != 0 ]]; then
 fi
 
 BUILD_PACKAGES=" \
-    clang++ \
+    clang \
     cmake \
+    libgtk-3-dev \
+    liblzma-dev \
     ninja-build \
     pkg-config \
 "
