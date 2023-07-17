@@ -1,0 +1,16 @@
+{
+    "id": "ruby",
+    "version": "1.0.0",
+    "name": "Ruby",
+    "description": "Install Ruby",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Ruby version to install"
+        }
+    }
+}
