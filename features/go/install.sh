@@ -44,10 +44,10 @@ if [[ ${GO_VERSION} != none ]]; then
     mkdir -p ${GOROOT}
     tar -xz -f /tmp/go.tar.gz -C ${GOROOT} --strip-components=1
 
+    rm -rf /tmp/go.tar.gz
+
     mkdir -p ${GOPATH}
     chmod a+rwx ${GOPATH}
-
-    rm -rf /tmp/go.tar.gz
 
     echo "export GOPATH=${GOPATH}" >> /etc/bash.bashrc
     echo "export GOROOT=${GOROOT}" >> /etc/bash.bashrc

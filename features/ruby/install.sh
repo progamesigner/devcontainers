@@ -2,6 +2,8 @@
 
 RUBY_VERSION=${VERSION:-${1:-none}}
 
+GEM_HOME=${GOROOT:-/usr/local/gem}
+
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
@@ -48,6 +50,12 @@ if [[ ${RUBY_VERSION} != none ]]; then
     cd -
 
     rm -rf /tmp/ruby.tar.gz /usr/src/ruby
+
+    mkdir -p ${GEM_HOME}
+    chmod a+rwx ${GEM_HOME}
+
+    echo "export GEM_HOME=${GEM_HOME}" >> /etc/bash.bashrc
+    echo "if [[ "\${PATH}" != *"\${GEM_HOME}/bin"* ]]; then export PATH="\${GEM_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
 
     apt-get autoremove --yes
     apt-get clean --yes
