@@ -29,6 +29,7 @@ PACKAGE_LIST=" \
     ca-certificates \
     curl \
     dialog \
+    gettext-base \
     git \
     gnupg2 \
     init-system-helpers \
