@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-DOCKER_VERSION=${VERSION:-${1:-none}}
-DOCKER_COMPOSE_VERSION=${COMPOSE:-${2:-none}}
+DOCKER_VERSION=${VERSION:-${1:-latest}}
+DOCKER_BUILDX_VERSION=${BUILDX:-${2:-latest}}
+DOCKER_COMPOSE_VERSION=${COMPOSE:-${3:-latest}}
 
 DOCKER_SHA256=${DOCKER_SHA256:-automatic}
-DOCKER_COMPOSE_SHA256=${DOCKER_COMPOSE_SHA256:-automatic}
 
 set -e
 
@@ -37,7 +37,11 @@ if [[ ${DOCKER_VERSION} != none ]]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION}.tgz
+    if [[ ${DOCKER_VERSION} = latest ]]; then
+        DOCKER_VERSION=$(curl -sSL https://api.github.com/repos/docker/docker/releases/latest | jq -r ".tag_name")
+    fi
+
+    curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION#v}.tgz
 
     tar -xz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
 
@@ -59,6 +63,38 @@ if [[ ${DOCKER_VERSION} != none ]]; then
     echo "Done!"
 fi
 
+if [[ ${DOCKER_BUILDX_VERSION} != none ]]; then
+    echo "Setup docker-buildx v${DOCKER_BUILDX_VERSION} ..."
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=linux-amd64;;
+        arm64) ARCHITECTURE=linux-arm64;;
+        armel) ARCHITECTURE=linux-arm-v6;;
+        armhf) ARCHITECTURE=linux-arm-v7;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    if [[ ${DOCKER_BUILDX_VERSION} = latest ]]; then
+        DOCKER_BUILDX_VERSION=$(curl -sSL https://api.github.com/repos/docker/buildx/releases/latest | jq -r ".tag_name")
+    fi
+
+    if [[ ${DOCKER_BUILDX_VERSION} != v* ]]; then
+        DOCKER_BUILDX_VERSION=v${DOCKER_BUILDX_VERSION}
+    fi
+
+    mkdir -p /usr/local/libexec/docker/cli-plugins
+    curl -sSL -o /usr/local/libexec/docker/cli-plugins/docker-buildx https://github.com/docker/buildx/releases/download/${DOCKER_BUILDX_VERSION}/buildx-${DOCKER_BUILDX_VERSION}.${ARCHITECTURE}
+    curl -sSL -o /tmp/docker-buildx.asc https://github.com/docker/buildx/releases/download/${DOCKER_BUILDX_VERSION}/checksums.txt
+    chmod +x /usr/local/libexec/docker/cli-plugins/docker-buildx
+
+    cat /tmp/docker-buildx.asc | grep "$(sha256sum /usr/local/libexec/docker/cli-plugins/docker-buildx | cut -d ' ' -f 1)"
+
+    rm -rf /tmp/docker-buildx.asc
+
+    echo "Done!"
+fi
+
 if [[ ${DOCKER_COMPOSE_VERSION} != none ]]; then
     echo "Setup docker-compose v${DOCKER_COMPOSE_VERSION} ..."
 
@@ -66,16 +102,18 @@ if [[ ${DOCKER_COMPOSE_VERSION} != none ]]; then
         DOCKER_COMPOSE_VERSION=$(curl -sSL https://api.github.com/repos/docker/compose/releases/latest | jq -r ".tag_name")
     fi
 
-    curl -sSL -o /usr/local/bin/docker-compose https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)
-    chmod +x /usr/local/bin/docker-compose
-
-    if [[ ${DOCKER_COMPOSE_SHA256} = automatic ]]; then
-        DOCKER_COMPOSE_SHA256=$(curl -sSL https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m).sha256)
+    if [[ ${DOCKER_COMPOSE_VERSION} != v* ]]; then
+        DOCKER_COMPOSE_VERSION=v${DOCKER_COMPOSE_VERSION}
     fi
 
-    if [[ ${DOCKER_COMPOSE_SHA256} != skip ]]; then
-        echo "${DOCKER_COMPOSE_SHA256}" | grep "$(sha256sum /usr/local/bin/docker-compose | cut -d ' ' -f 1)"
-    fi
+    mkdir -p /usr/local/libexec/docker/cli-plugins
+    curl -sSL -o /usr/local/libexec/docker/cli-plugins/docker-compose https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)
+    curl -sSL -o /tmp/docker-compose.asc https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/checksums.txt
+    chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose
+
+    cat /tmp/docker-compose.asc | grep "$(sha256sum /usr/local/libexec/docker/cli-plugins/docker-compose | cut -d ' ' -f 1)"
+
+    rm -rf /tmp/docker-compose.asc
 
     echo "Done!"
 fi
