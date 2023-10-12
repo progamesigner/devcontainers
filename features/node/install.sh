@@ -76,7 +76,6 @@ if [[ ${NODE_VERSION} != none ]]; then
     mkdir -p ${NPM_HOME}
     chmod a+rwx ${NPM_HOME}
 
-    echo "prefix=${NPM_HOME}" >> /usr/local/etc/npmrc
     echo "if [[ "\${PATH}" != *"\${NPM_HOME}/bin"* ]]; then export PATH="\${NPM_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
 
     apt-get autoremove --yes
