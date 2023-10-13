@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -45,6 +45,15 @@
             ],
             "default": "none",
             "description": "Select or enter a tailscale version"
+        },
+        "watchman": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a watchman version"
         }
     },
     "entrypoint": "/usr/local/share/devtools-init.sh"
