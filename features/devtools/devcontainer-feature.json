@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -52,7 +52,7 @@
                 "none",
                 "latest"
             ],
-            "default": "latest",
+            "default": "none",
             "description": "Select or enter a watchman version"
         }
     },
