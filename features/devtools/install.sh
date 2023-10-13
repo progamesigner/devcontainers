@@ -5,6 +5,7 @@ BUF_VERSION=${BUF:-none}
 CLOUDFLARED_VERSION=${CLOUDFLARED:-none}
 STEP_VERSION=${STEP:-none}
 TAILSCALE_VERSION=${TAILSCALE:-none}
+WATCHMAN_VERSION=${WATCHMAN:-none}
 
 BUF_SHA256=${BUF_SHA256:-automatic}
 
@@ -193,6 +194,24 @@ if [[ ${TAILSCALE_VERSION} != none ]]; then
     mkdir -p /var/run/tailscale
 
     rm -rf /tmp/tailscale /tmp/tailscale.tar.gz
+fi
+
+if [[ ${WATCHMAN_VERSION} != none ]]; then
+    echo "Setup watchman v${WATCHMAN_VERSION} ..."
+
+    if [[ ${WATCHMAN_VERSION} = latest ]]; then
+        WATCHMAN_VERSION=$(curl -sSL https://api.github.com/repos/facebook/watchman/releases/latest | jq -r ".tag_name")
+    fi
+
+    if [[ ${WATCHMAN_VERSION} != v* ]]; then
+        WATCHMAN_VERSION=v${WATCHMAN_VERSION}
+    fi
+
+    curl -sSL -o /tmp/watchman.deb https://github.com/facebook/watchman/releases/download/${WATCHMAN_VERSION}/watchman_ubuntu22.04_${WATCHMAN_VERSION}.deb
+
+    apt-get install --fix-broken --yes /tmp/watchman.deb
+
+    rm -rf /tmp/watchman.deb
 fi
 
 echo "$(cat << 'EOF'
