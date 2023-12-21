@@ -37,6 +37,7 @@ BUILD_PACKAGES=" \
 "
 
 GPG_KEYS=" \
+    7169605F62C751356D054A26A821E680E5FA6305 \
     A035C8C19219BA821ECEA86B64E628F8D684696D \
     E3FF2839C048B25C084DEBE9B26995E310250568 \
     0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D \
@@ -71,7 +72,6 @@ if [[ ${PYTHON_VERSION} != none ]]; then
         --enable-option-checking=fatal \
         --with-ensurepip=install \
         --with-system-expat \
-        --with-system-ffi \
     "
     if [[ ${PYTHON_OPTIMIZE} = true ]]; then
         CONFIG_FLAGS="${CONFIG_FLAGS} --enable-optimizations"
