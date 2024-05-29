@@ -23,6 +23,7 @@ if [[ ${GCLOUD_CLI_VERSION} != none ]]; then
         arm64|armel|armhf) ARCHITECTURE=arm;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
+
     curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_CLI_VERSION}-linux-${ARCHITECTURE}.tar.gz
 
     mkdir -p /usr/local/share/gcloud-cli
