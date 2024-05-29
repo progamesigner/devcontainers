@@ -1,0 +1,19 @@
+{
+    "id": "terraform",
+    "version": "1.0.0",
+    "name": "Terraform",
+    "description": "Install terraform",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Terraform version to install"
+        }
+    },
+    "containerEnv": {
+        "PATH": "${PATH}:/usr/local/share/terraform/bin"
+    }
+}
