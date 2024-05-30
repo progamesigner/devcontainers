@@ -72,10 +72,7 @@ if [[ ${NODE_VERSION} != none ]]; then
     curl -sSL -o /tmp/node.tar.xz.asc https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.asc
 
     export GNUPGHOME=$(mktemp -d)
-    for GPG_KEY in ${GPG_KEYS}; do
-        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEY} || \
-        gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY}
-    done
+    gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
     gpg --batch -d -o /tmp/SHASUMS256.txt /tmp/node.tar.xz.asc
     cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/node.tar.xz | cut -d ' ' -f 1)"
     gpgconf --kill all

@@ -55,10 +55,7 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     curl -sSL -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
 
     export GNUPGHOME=$(mktemp -d)
-    for GPG_KEY in ${GPG_KEYS}; do
-        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEY} || \
-        gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY}
-    done
+    gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
     gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
     gpgconf --kill all
     rm -rf ${GNUPGHOME}

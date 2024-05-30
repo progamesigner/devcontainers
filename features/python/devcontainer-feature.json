@@ -1,6 +1,6 @@
 {
     "id": "python",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "Python",
     "description": "Install Python",
     "options": {

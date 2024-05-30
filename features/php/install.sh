@@ -91,10 +91,7 @@ if [[ ${PHP_VERSION} != none ]]; then
     curl -sSL -o /tmp/php.tar.xz.asc https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc
 
     export GNUPGHOME=$(mktemp -d)
-    for GPG_KEY in ${GPG_KEYS}; do
-        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEY} || \
-        gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEY}
-    done
+    gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
     gpg --batch --verify /tmp/php.tar.xz.asc /tmp/php.tar.xz
     gpgconf --kill all
     rm -rf ${GNUPGHOME}
