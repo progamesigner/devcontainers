@@ -228,7 +228,11 @@ execute() {
 }
 
 if [ -n "$(command -v cloudflared)" ] && [ -n "${CLOUDFLARE_TUNNEL_TOKEN}" ]; then
-    execute cloudflared service install -- ${CLOUDFLARE_TUNNEL_TOKEN}
+    if [ ! -f /etc/init.d/cloudflared ]; then
+        execute cloudflared service install -- ${CLOUDFLARE_TUNNEL_TOKEN}
+    fi
+
+    execute service cloudflared restart
 fi
 
 if [ -n "$(command -v tailscaled)" ]; then
