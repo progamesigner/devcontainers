@@ -54,8 +54,6 @@ PACKAGE_LIST=" \
     tcpdump \
     telnet \
     tree \
-    unzip \
-    wget \
 "
 
 echo "Install DevTools ..."

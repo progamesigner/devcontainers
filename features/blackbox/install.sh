@@ -12,16 +12,8 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
-BUILD_PACKAGES=" \
-    unzip \
-"
-
 if [[ ${BLACKBOX_VERSION} != none ]]; then
     echo "Setup Blackbox v${BLACKBOX_VERSION} ..."
-
-    apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
 
     BLACKBOX_URL=https://github.com/StackExchange/blackbox/archive/refs/tags/${BLACKBOX_VERSION}.zip
     if [[ ${BLACKBOX_VERSION} = latest ]]; then

@@ -14,10 +14,6 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
-BUILD_PACKAGES=" \
-    unzip \
-"
-
 GPG_KEY_MARTIAL="
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
@@ -52,10 +48,6 @@ B8HCtGjfod0p1A==
 
 if [[ ${AWS_CLI_VERSION} != none ]]; then
     echo "Setup AWS CLI v${AWS_CLI_VERSION} ..."
-
-    apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
 
     ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in

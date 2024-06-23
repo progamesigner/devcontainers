@@ -12,16 +12,8 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
-BUILD_PACKAGES=" \
-    unzip \
-"
-
 if [[ ${TERRAFORM_VERSION} != none ]]; then
     echo "Setup Terraform v${TERRAFORM_VERSION} ..."
-
-    apt-get update
-    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
-    apt-get upgrade --no-install-recommends --yes
 
     ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in

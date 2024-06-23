@@ -53,6 +53,7 @@ PACKAGE_LIST=" \
     tzdata \
     unzip \
     vim-tiny \
+    wget \
     wireguard \
     zsh \
 "
