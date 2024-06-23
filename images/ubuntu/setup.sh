@@ -51,6 +51,7 @@ PACKAGE_LIST=" \
     sudo \
     tar \
     tzdata \
+    unzip \
     vim-tiny \
     wireguard \
     zsh \
