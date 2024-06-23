@@ -57,9 +57,9 @@ PACKAGE_LIST=" \
     zsh \
 "
 
-if [[ -n $(apt-cache --names-only search ^libssl3$) ]]; then
+if [[ -n "$(apt-cache --names-only search ^libssl3$)" ]]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl3"
-elif [[ -n $(apt-cache --names-only search ^libssl1.1$) ]]; then
+elif [[ -n "$(apt-cache --names-only search ^libssl1.1$)" ]]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl1.1"
 fi
 
@@ -74,8 +74,21 @@ locale-gen
 
 # Create non-root user with matched UID/GID
 if [[ ${USERNAME} != root ]]; then
-    groupadd -g ${USER_GID} ${USERNAME}
-    useradd -ms /bin/bash -g ${USER_GID} -u ${USER_UID} ${USERNAME}
+    if [ -z "$(getent group ${USER_GID})" ]; then
+        groupadd -g ${USER_GID} ${USERNAME}
+    fi
+
+    if [ -z "$(getent passwd ${USER_UID})" ]; then
+        useradd -g ${USER_GID} -ms /bin/bash -u ${USER_UID} ${USERNAME}
+    fi
+
+    if [[ "$(id -ng ${USER_GID})" != "${USERNAME}" ]]; then
+        groupmod -n ${USERNAME} $(id -ng ${USER_GID})
+    fi
+
+    if [[ "$(id -nu ${USER_UID})" != "${USERNAME}" ]]; then
+        usermod -d /home/${USERNAME} -g ${USER_GID} -l ${USERNAME} -ms /bin/bash $(id -nu ${USER_UID})
+    fi
 
     # Add non-root user to sudoers
     echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME}
@@ -92,9 +105,9 @@ get_in_path_except_current() {
 
 code="$(get_in_path_except_current code)"
 
-if [[ -n $code ]]; then
+if [[ -n "$code" ]]; then
     exec "$code" "$@"
-elif [[ -n $(command -v code-insiders) ]]; then
+elif [[ -n "$(command -v code-insiders)" ]]; then
     exec code-insiders "$@"
 else
     echo "code or code-insiders is not installed" >&2
@@ -140,7 +153,7 @@ fi
 # Set the default git editor if not already set
 if [ -z "$(git config --get core.editor)" ] && [ -z "${GIT_EDITOR}" ]; then
     if  [ "${TERM_PROGRAM}" = "vscode" ]; then
-        if [[ -n $(command -v code-insiders) &&  -z $(command -v code) ]]; then
+        if [[ -n "$(command -v code-insiders)" &&  -z "$(command -v code)" ]]; then
             export GIT_EDITOR="code-insiders --wait"
         else
             export GIT_EDITOR="code --wait"

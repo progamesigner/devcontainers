@@ -16,9 +16,9 @@ jobs:
       matrix:
         distro:
         - ubuntu
-        include:
-        - distro: ubuntu
-          variant: jammy
+        variant:
+        - jammy
+        - noble
     steps:
     - run: |
         echo IMAGE_CREATED=$(date --utc +'%Y-%m-%dT%H:%M:%SZ') >> $GITHUB_ENV

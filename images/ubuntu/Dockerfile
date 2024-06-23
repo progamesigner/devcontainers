@@ -1,5 +1,5 @@
 ARG DISTRO=ubuntu
-ARG VARIANT=jammy
+ARG VARIANT=noble
 
 FROM ${DISTRO}:${VARIANT}
 
