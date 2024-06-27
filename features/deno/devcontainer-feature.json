@@ -12,16 +12,5 @@
             "default": "none",
             "description": "Select or enter a Deno version to install"
         }
-    },
-    "containerEnv": {
-        "GOPATH": "/opt/go",
-        "GOROOT": "/usr/local/go",
-        "PATH": "${PATH}:${GOROOT}/bin:${GOPATH}/bin"
-    },
-    "capAdd": [
-        "SYS_PTRACE"
-    ],
-    "securityOpt": [
-        "seccomp=unconfined"
-    ]
+    }
 }
