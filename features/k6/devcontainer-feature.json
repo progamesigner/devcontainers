@@ -1,0 +1,17 @@
+{
+    "id": "k6",
+    "version": "1.0.0",
+    "name": "k6",
+    "description": "Install k6",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a k6 version to install"
+        }
+    }
+}
