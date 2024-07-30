@@ -39,7 +39,7 @@ if [[ ${K6_VERSION} != none ]]; then
     tar -xz -f /tmp/k6.tar.gz -C /tmp/k6 --strip-components=1
     cp -v /tmp/k6/k6 /usr/local/bin/k6
 
-    rm -rf /tmp/k6 /tmp/k6.tar.gz.asc /tmp/k6.tar.xz
+    rm -rf /tmp/k6 /tmp/k6.tar.gz.asc /tmp/k6.tar.gz
 
     echo "Done!"
 fi

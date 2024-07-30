@@ -94,7 +94,7 @@ if [[ ${HELM_VERSION} != none ]]; then
     cp -v /tmp/helm/linux-${ARCHITECTURE}/helm /usr/local/bin/helm
     chmod +x /usr/local/bin/helm
 
-    rm -rf /tmp/helm.tar.gz /tmp/helm.tar.gz.asc /tmp/helm
+    rm -rf /tmp/helm.tar.gz /tmp/helm.tar.gz.asc /tmp/helm.tar.gz.sha256 /tmp/helm.tar.gz.sha256.asc /tmp/helm
 
     echo "Done!"
 fi
