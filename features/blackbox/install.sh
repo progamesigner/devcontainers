@@ -6,6 +6,10 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
+BUILD_PACKAGES=" \
+    make \
+"
+
 # Check the script is run as root
 if [[ $(id -u) != 0 ]]; then
     echo "The script must be run as root. Use sudo, su, or add \"USER root\" to your Dockerfile before running this script."
@@ -14,6 +18,10 @@ fi
 
 if [[ ${BLACKBOX_VERSION} != none ]]; then
     echo "Setup Blackbox v${BLACKBOX_VERSION} ..."
+
+    apt-get update
+    apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
+    apt-get upgrade --no-install-recommends --yes
 
     BLACKBOX_URL=https://github.com/StackExchange/blackbox/archive/refs/tags/${BLACKBOX_VERSION}.zip
     if [[ ${BLACKBOX_VERSION} = latest ]]; then
