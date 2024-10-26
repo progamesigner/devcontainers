@@ -1,6 +1,6 @@
 {
     "id": "node",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "name": "NodeJS",
     "description": "Install NodeJS",
     "options": {
@@ -20,8 +20,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"dbaeumer.vscode-eslint",
-				"esbenp.prettier-vscode"
+				"biomejs.biome"
 			]
 		}
 	}
