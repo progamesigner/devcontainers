@@ -30,7 +30,10 @@ if [[ ${GCLOUD_CLI_VERSION} != none ]]; then
     tar -xz -f /tmp/gcloud-cli.tar.gz -C /usr/local/share/gcloud-cli --strip-components=1
 
     /usr/local/share/gcloud-cli/install.sh --command-completion=false --path-update=false --quiet --rc-path=false --usage-reporting=false
-    /usr/local/share/gcloud-cli/bin/gcloud components install ${GCLOUD_ADDITIONAL_COMPONENTS} --quiet
+
+    if [ -n "${GCLOUD_ADDITIONAL_COMPONENTS}" ]; then
+        /usr/local/share/gcloud-cli/bin/gcloud components install ${GCLOUD_ADDITIONAL_COMPONENTS} --quiet
+    fi
 
     rm -rf /tmp/gcloud-cli.tar.gz
 
