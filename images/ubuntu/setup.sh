@@ -215,6 +215,13 @@ if [[ ${USERNAME} != root ]]; then
 fi
 chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.bashrc
 
+# Create folders
+mkdir -p ${USER_RC_PATH}/.cache
+mkdir -p ${USER_RC_PATH}/.config
+
+chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.cache
+chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.config
+
 # Clean up
 apt-get autoremove --yes
 apt-get clean --yes
