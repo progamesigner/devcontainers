@@ -58,9 +58,9 @@ PACKAGE_LIST=" \
     zsh \
 "
 
-if [[ -n "$(apt-cache --names-only search ^libssl3$)" ]]; then
+if [ -n "$(apt-cache --names-only search ^libssl3$)" ]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl3"
-elif [[ -n "$(apt-cache --names-only search ^libssl1.1$)" ]]; then
+elif [ -n "$(apt-cache --names-only search ^libssl1.1$)" ]; then
     PACKAGE_LIST="${PACKAGE_LIST} libssl1.1"
 fi
 
@@ -106,9 +106,9 @@ get_in_path_except_current() {
 
 code="$(get_in_path_except_current code)"
 
-if [[ -n "$code" ]]; then
+if [ -n "$code" ]; then
     exec "$code" "$@"
-elif [[ -n "$(command -v code-insiders)" ]]; then
+elif [ -n "$(command -v code-insiders)" ]; then
     exec code-insiders "$@"
 else
     echo "code or code-insiders is not installed" >&2
@@ -124,7 +124,7 @@ echo "$(cat << 'EOF'
 
 set -e
 
-if [[ -d /run/systemd/system ]]; then
+if [ -d /run/systemd/system ]; then
     exec /bin/systemctl/systemctl "$@"
 else
     echo '\n"systemd" is not running in this container due to its overhead.\nUse the "service" command to start services intead. e.g.: \n\nservice --status-all'
@@ -135,7 +135,6 @@ chmod +x /usr/local/bin/systemctl
 
 # Configure shell
 SHELL_RC_SNIPPET="$(cat << 'EOF'
-
 if [ -z "${USER}" ]; then export USER=$(whoami); fi
 if [[ "${PATH}" != *"$HOME/.local/bin"* ]]; then export PATH="${PATH}:$HOME/.local/bin"; fi
 
@@ -154,19 +153,17 @@ fi
 # Set the default git editor if not already set
 if [ -z "$(git config --get core.editor)" ] && [ -z "${GIT_EDITOR}" ]; then
     if  [ "${TERM_PROGRAM}" = "vscode" ]; then
-        if [[ -n "$(command -v code-insiders)" &&  -z "$(command -v code)" ]]; then
+        if [ -n "$(command -v code-insiders)" ] && [ -z "$(command -v code)" ]; then
             export GIT_EDITOR="code-insiders --wait"
         else
             export GIT_EDITOR="code --wait"
         fi
     fi
 fi
-
 EOF
 )"
 
 USER_RC_SNIPPET="$(cat <<'EOF'
-
 # Codespaces bash prompt theme
 __bash_prompt() {
     local userpart='`export XIT=$? \
@@ -191,7 +188,6 @@ __bash_prompt() {
 }
 __bash_prompt
 export PROMPT_DIRTRIM=4
-
 EOF
 )"
 
