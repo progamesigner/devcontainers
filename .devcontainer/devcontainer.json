@@ -1,14 +1,7 @@
 {
 	"name": "DevContainers",
 	"image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:jammy",
-	"features": {
-		"ghcr.io/progamesigner/devcontainers/features/node:latest": {
-			"version": "18.12.0"
-		},
-		"ghcr.io/progamesigner/devcontainers/features/docker:latest": {
-			"version": "20.10.20"
-		}
-	},
+	"features": {},
 	"customizations": {
 		"vscode": {
 			"extensions": [
