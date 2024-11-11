@@ -1,6 +1,6 @@
 {
 	"name": "DevContainers",
-	"image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:jammy",
+	"image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:noble",
 	"features": {},
 	"customizations": {
 		"vscode": {
