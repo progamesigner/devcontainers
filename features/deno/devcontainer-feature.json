@@ -1,6 +1,6 @@
 {
     "id": "deno",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Deno",
     "description": "Install Deno",
     "options": {
@@ -12,5 +12,12 @@
             "default": "none",
             "description": "Select or enter a Deno version to install"
         }
-    }
+    },
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"denoland.vscode-deno"
+			]
+		}
+	}
 }
