@@ -19,7 +19,9 @@ BUILD_PACKAGES=" \
     gcc \
     gzip \
     libc-dev \
+    libssl-dev \
     lldb \
+    pkg-config \
 "
 
 if [[ ${RUST_VERSION} != none ]]; then
