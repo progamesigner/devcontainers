@@ -40,6 +40,7 @@ PACKAGE_LIST=" \
     iputils-tracepath \
     lsof \
     lynx \
+    moreutils \
     mtr \
     ncdu \
     net-tools \
