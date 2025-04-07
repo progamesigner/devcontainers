@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-KUBECTL_VERSION=${KUBECTL:-${1:-none}}
-HELM_VERSION=${HELM:-${2:-none}}
+KUBECTL_VERSION=${KUBECTL:-${1:-latest}}
+KUSTOMIZE_VERSION=${KUSTOMIZE:-${2:-latest}}
+HELM_VERSION=${HELM:-${3:-latest}}
 
 KUBECTL_SHA256=${KUBECTL_SHA256:-automatic}
 HELM_SHA256=${HELM_SHA256:-automatic}
@@ -44,6 +45,39 @@ if [[ ${KUBECTL_VERSION} != none ]]; then
     if [[ ${KUBECTL_SHA256} != skip ]]; then
         echo "${KUBECTL_SHA256}" | grep "$(sha256sum /usr/local/bin/kubectl | cut -d ' ' -f 1)"
     fi
+
+    echo "Done!"
+fi
+
+if [[ ${KUSTOMIZE_VERSION} != none ]]; then
+    echo "Setup Kustomize v${KUSTOMIZE_VERSION} ..."
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    if [[ ${KUSTOMIZE_VERSION} = latest ]]; then
+        KUSTOMIZE_VERSION=$(curl -sSL https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | jq -r ".tag_name | sub(\"kustomize/\"; \"\")")
+    fi
+
+    if [[ ${KUSTOMIZE_VERSION} != v* ]]; then
+        KUSTOMIZE_VERSION=v${KUSTOMIZE_VERSION}
+    fi
+
+    curl -sSL -o /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_${ARCHITECTURE}.tar.gz
+    curl -sSL -o /tmp/kustomize.tar.gz.asc https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/checksums.txt
+
+    cat /tmp/kustomize.tar.gz.asc | grep "$(sha256sum /tmp/kustomize.tar.gz | cut -d ' ' -f 1)"
+
+    mkdir -p /tmp/kustomize
+    tar -xz -f /tmp/kustomize.tar.gz -C /tmp/kustomize
+    cp -v /tmp/kustomize/kustomize /usr/local/bin/kustomize
+    chmod +x /usr/local/bin/kustomize
+
+    rm -rf /tmp/kustomize.tar.gz /tmp/kustomize.tar.gz.asc /tmp/kustomize
 
     echo "Done!"
 fi
