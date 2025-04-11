@@ -18,6 +18,7 @@ if [[ ${DENO_VERSION} != none ]]; then
     ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
         amd64) ARCHITECTURE=x86_64-unknown-linux-gnu;;
+        arm64) ARCHITECTURE=aarch64-unknown-linux-gnu;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
