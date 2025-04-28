@@ -31,18 +31,14 @@ if [[ ${DENO_VERSION} != none ]]; then
     fi
 
     curl -sSL -o /tmp/deno.zip https://github.com/denoland/deno/releases/download/${DENO_VERSION}/deno-${ARCHITECTURE}.zip
+    curl -sSL -o /tmp/SHASUMS256.txt https://github.com/denoland/deno/releases/download/${DENO_VERSION}/deno-${ARCHITECTURE}.zip.sha256sum
 
-    mkdir -p /usr/local/lib/deno
-    unzip -o /tmp/deno.zip -d /usr/local/lib/deno/bin
+    cat /tmp/SHASUMS256.txt | grep "$(sha256sum /tmp/deno.zip | cut -d ' ' -f 1)"
 
-    chmod +x /usr/local/lib/deno/bin/deno
-    rm -rf /tmp/deno.zip
+    unzip -o /tmp/deno.zip -d /usr/local/bin
 
-    ln -s /usr/local/lib/deno/bin/deno /usr/local/bin/deno
-
-    apt-get autoremove --yes
-    apt-get clean --yes
-    rm -rf /var/lib/apt/lists/*
+    chmod +x /usr/local/bin/deno
+    rm -rf /tmp/deno.zip /tmp/SHASUMS256.txt
 
     echo "Done!"
 fi
