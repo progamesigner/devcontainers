@@ -1,6 +1,6 @@
 {
     "id": "python",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "name": "Python",
     "description": "Install Python",
     "options": {
@@ -21,6 +21,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"charliermarsh.ruff",
 				"ms-python.python",
 				"ms-python.vscode-pylance"
 			]
