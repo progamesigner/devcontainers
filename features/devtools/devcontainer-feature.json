@@ -1,25 +1,9 @@
 {
     "id": "devtools",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
-        "act": {
-            "type": "string",
-            "proposals": [
-                "none"
-            ],
-            "default": "none",
-            "description": "Select or enter a act version"
-        },
-        "buf": {
-            "type": "string",
-            "proposals": [
-                "none"
-            ],
-            "default": "none",
-            "description": "Select or enter a buf version"
-        },
         "cloudflared": {
             "type": "string",
             "proposals": [
@@ -29,14 +13,6 @@
             "default": "none",
             "description": "Select or enter a cloudflared version"
         },
-        "step": {
-            "type": "string",
-            "proposals": [
-                "none"
-            ],
-            "default": "none",
-            "description": "Select or enter a step version"
-        },
         "tailscale": {
             "type": "string",
             "proposals": [
@@ -45,16 +21,7 @@
             ],
             "default": "none",
             "description": "Select or enter a tailscale version"
-        },
-        "watchman": {
-            "type": "string",
-            "proposals": [
-                "none",
-                "latest"
-            ],
-            "default": "none",
-            "description": "Select or enter a watchman version"
         }
     },
-    "onCreateCommand": "/usr/local/share/devtools-init.sh"
+    "entrypoint": "/usr/local/share/devtools-init.sh"
 }
