@@ -1,0 +1,17 @@
+{
+    "id": "step",
+    "version": "1.0.0",
+    "name": "step",
+    "description": "Install step",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a step version to install"
+        }
+    }
+}
