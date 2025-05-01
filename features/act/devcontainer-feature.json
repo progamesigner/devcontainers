@@ -1,0 +1,17 @@
+{
+    "id": "act",
+    "version": "1.0.0",
+    "name": "act",
+    "description": "Install act",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a act version to install"
+        }
+    }
+}
