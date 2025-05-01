@@ -1,0 +1,17 @@
+{
+    "id": "watchman",
+    "version": "1.0.0",
+    "name": "watchman",
+    "description": "Install watchman",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a watchman version to install"
+        }
+    }
+}
