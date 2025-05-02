@@ -25,6 +25,7 @@ PACKAGE_LIST=" \
     htop \
     ifstat \
     iftop \
+    iotop \
     iperf \
     iproute2 \
     iptables \
@@ -34,6 +35,7 @@ PACKAGE_LIST=" \
     iputils-ping \
     iputils-tracepath \
     lsof \
+    ltrace \
     lynx \
     moreutils \
     mtr \
