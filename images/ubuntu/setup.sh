@@ -43,11 +43,13 @@ PACKAGE_LIST=" \
     libstdc++6 \
     locales \
     lsb-release \
+    make \
     man-db \
     manpages \
     manpages-dev \
     openssh-client \
     procps \
+    ripgrep \
     sudo \
     tar \
     tzdata \
