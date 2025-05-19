@@ -31,6 +31,7 @@ PACKAGE_LIST=" \
     dialog \
     gettext-base \
     git \
+    git-lfs \
     gnupg2 \
     init-system-helpers \
     jq \
