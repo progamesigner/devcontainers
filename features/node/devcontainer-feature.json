@@ -1,6 +1,6 @@
 {
     "id": "node",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "name": "NodeJS",
     "description": "Install NodeJS",
     "options": {
