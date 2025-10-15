@@ -52,13 +52,20 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     apt-get upgrade --no-install-recommends --yes
 
     curl -sSL -o /tmp/python.tar.xz https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
-    curl -sSL -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc
+    curl -sSLf -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc || true
+    curl -sSLf -o /tmp/python.tar.xz.sigstore https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.sigstore || true
 
-    export GNUPGHOME=$(mktemp -d)
-    gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
-    gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
-    gpgconf --kill all
-    rm -rf ${GNUPGHOME}
+    if [ -n "$(command -v cosign)" ] && [ -f /tmp/python.tar.xz.sigstore ]; then
+        cosign verify-blob --bundle=/tmp/python.tar.xz.sigstore --certificate-identity-regexp='.*' --certificate-oidc-issuer-regexp='.*' /tmp/python.tar.xz
+    fi
+
+    if [ -f /tmp/python.tar.xz.asc ]; then
+        export GNUPGHOME=$(mktemp -d)
+        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
+        gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
+        gpgconf --kill all
+        rm -rf ${GNUPGHOME}
+    fi
 
     mkdir -p /usr/src/python
     tar -xJ -f /tmp/python.tar.xz -C /usr/src/python --strip-components=1
@@ -83,7 +90,7 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     make install
     cd -
 
-    rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz /usr/src/python
+    rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz.sigstore /tmp/python.tar.xz /usr/src/python
 
     ln -s /usr/local/bin/idle3 /usr/local/bin/idle
     ln -s /usr/local/bin/pip3 /usr/local/bin/pip
