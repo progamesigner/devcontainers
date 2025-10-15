@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {
@@ -12,6 +12,15 @@
             ],
             "default": "none",
             "description": "Select or enter a cloudflared version"
+        },
+        "cosign": {
+            "type": "string",
+            "proposals": [
+                "none",
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Select or enter a cosign version"
         },
         "tailscale": {
             "type": "string",

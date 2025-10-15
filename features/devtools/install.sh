@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 CLOUDFLARED_VERSION=${CLOUDFLARED:-none}
+COSIGN_VERSION=${COSIGN:-latest}
 TAILSCALE_VERSION=${TAILSCALE:-none}
-WATCHMAN_VERSION=${WATCHMAN:-none}
 
 set -e
 
@@ -60,16 +60,6 @@ apt-get update
 apt-get install --no-install-recommends --yes ${PACKAGE_LIST}
 apt-get upgrade --no-install-recommends --yes
 
-ARCHITECTURE=""
-case "$(dpkg --print-architecture)" in
-    i386) ARCHITECTURE=386;;
-    amd64) ARCHITECTURE=amd64;;
-    arm64) ARCHITECTURE=arm64;;
-    armel) ARCHITECTURE=armv6;;
-    armhf) ARCHITECTURE=armv7;;
-    *) echo "unsupported architecture"; exit 1 ;;
-esac
-
 if [[ ${CLOUDFLARED_VERSION} != none ]]; then
     echo "Setup cloudflared v${CLOUDFLARED_VERSION} ..."
 
@@ -80,6 +70,33 @@ if [[ ${CLOUDFLARED_VERSION} != none ]]; then
     chmod +x /usr/local/bin/cloudflared
 
     rm -rf /tmp/cloudflared
+fi
+
+if [[ ${COSIGN_VERSION} != none ]]; then
+    echo "Setup cosign v${COSIGN_VERSION} ..."
+
+    ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        i386) ARCHITECTURE=386;;
+        amd64) ARCHITECTURE=amd64;;
+        arm64) ARCHITECTURE=arm64;;
+        armel) ARCHITECTURE=armv6;;
+        armhf) ARCHITECTURE=armv7;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
+    if [[ ${COSIGN_VERSION} = latest ]]; then
+        COSIGN_VERSION=$(curl -sSL https://api.github.com/repos/sigstore/cosign/releases/latest | jq -r ".tag_name")
+    fi
+
+    if [[ ${COSIGN_VERSION} != v* ]]; then
+        COSIGN_VERSION=v${COSIGN_VERSION}
+    fi
+
+    curl -sSL -o /tmp/cosign.deb https://github.com/sigstore/cosign/releases/latest/download/cosign_${COSIGN_VERSION#v}_${ARCHITECTURE}.deb
+    dpkg --install /tmp/cosign.deb
+
+    rm -rf /tmp/cosign.deb
 fi
 
 if [[ ${TAILSCALE_VERSION} != none ]]; then
