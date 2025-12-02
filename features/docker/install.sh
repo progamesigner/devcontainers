@@ -41,6 +41,9 @@ if [[ ${DOCKER_VERSION} != none ]]; then
         DOCKER_VERSION=$(curl -sSL https://api.github.com/repos/docker/docker/releases/latest | jq -r ".tag_name")
     fi
 
+    DOCKER_VERSION=${DOCKER_VERSION#docker-}
+    DOCKER_VERSION=${DOCKER_VERSION#v}
+
     curl -sSL -o /tmp/docker.tar.gz https://download.docker.com/linux/static/stable/${ARCHITECTURE}/docker-${DOCKER_VERSION#v}.tgz
 
     tar -xz -f /tmp/docker.tar.gz -C /usr/local/bin --strip-components=1
