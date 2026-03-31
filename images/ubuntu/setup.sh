@@ -26,6 +26,7 @@ PACKAGE_LIST=" \
     apt-transport-https \
     apt-utils \
     bash \
+    bubblewrap \
     ca-certificates \
     curl \
     dialog \
