@@ -1,12 +1,12 @@
 {
-	"name": "DevContainers",
-	"image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:noble",
-	"features": {},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"mads-hartmann.bash-ide-vscode"
-			]
-		}
-	}
+    "name": "DevContainers",
+    "image": "ghcr.io/progamesigner/devcontainers/images/ubuntu:noble",
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "mads-hartmann.bash-ide-vscode"
+            ]
+        }
+    }
 }

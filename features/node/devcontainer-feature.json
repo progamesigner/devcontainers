@@ -17,11 +17,11 @@
         "NPM_HOME": "/usr/local/npm",
         "PATH": "${PATH}:${NPM_HOME}/bin"
     },
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"biomejs.biome"
-			]
-		}
-	}
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "biomejs.biome"
+            ]
+        }
+    }
 }

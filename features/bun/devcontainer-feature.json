@@ -14,11 +14,11 @@
             "description": "Select or enter a Bun version to install"
         }
     },
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"oven.bun-vscode"
-			]
-		}
-	}
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "oven.bun-vscode"
+            ]
+        }
+    }
 }

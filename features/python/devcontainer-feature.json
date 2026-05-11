@@ -18,13 +18,13 @@
             "description": "Optimize Python for performance when compiled (slow)"
         }
     },
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"charliermarsh.ruff",
-				"ms-python.python",
-				"ms-python.vscode-pylance"
-			]
-		}
-	}
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "charliermarsh.ruff",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
 }
