@@ -1,6 +1,6 @@
 {
     "id": "opencode",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "OpenCode",
     "description": "Install OpenCode",
     "options": {
@@ -16,5 +16,12 @@
     },
     "containerEnv": {
         "PATH": "${PATH}:/usr/local/share/opencode/bin"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "sst-dev.opencode"
+            ]
+        }
     }
 }
