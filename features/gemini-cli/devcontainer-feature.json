@@ -1,0 +1,17 @@
+{
+    "id": "gemini-cli",
+    "version": "1.0.0",
+    "name": "Gemini CLI",
+    "description": "Install Gemini CLI",
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/node",
+        "ghcr.io/progamesigner/devcontainers/features/node"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Google.gemini-cli-vscode-ide-companion"
+            ]
+        }
+    }
+}

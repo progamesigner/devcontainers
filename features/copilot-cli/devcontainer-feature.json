@@ -1,0 +1,20 @@
+{
+    "id": "copilot-cli",
+    "version": "1.0.0",
+    "name": "GitHub Copilot CLI",
+    "description": "Install GitHub Copilot CLI",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a GitHub Copilot CLI version to install"
+        }
+    },
+    "containerEnv": {
+        "PATH": "${PATH}:/usr/local/share/copilot-cli/bin"
+    }
+}
