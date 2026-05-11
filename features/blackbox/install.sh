@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BLACKBOX_VERSION=${VERSION:-${1:-none}}
+BLACKBOX_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

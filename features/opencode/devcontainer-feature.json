@@ -1,15 +1,16 @@
 {
     "id": "opencode",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "OpenCode",
     "description": "Install OpenCode",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter an OpenCode version to install"
         }
     },

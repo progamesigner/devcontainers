@@ -24,7 +24,11 @@ if [[ ${GCLOUD_CLI_VERSION} != none ]]; then
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
-    curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_CLI_VERSION}-linux-${ARCHITECTURE}.tar.gz
+    if [[ ${GCLOUD_CLI_VERSION} = latest ]]; then
+        curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-${ARCHITECTURE}.tar.gz
+    elif
+        curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_CLI_VERSION}-linux-${ARCHITECTURE}.tar.gz
+    fi
 
     mkdir -p /usr/local/share/gcloud-cli
     tar -xz -f /tmp/gcloud-cli.tar.gz -C /usr/local/share/gcloud-cli --strip-components=1

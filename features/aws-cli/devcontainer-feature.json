@@ -1,15 +1,16 @@
 {
     "id": "aws-cli",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "AWS CLI",
     "description": "Install AWS CLI",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a AWS CLI version to install"
         },
         "ssm": {

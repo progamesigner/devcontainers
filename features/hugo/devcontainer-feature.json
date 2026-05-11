@@ -7,9 +7,10 @@
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a Hugo version to install"
         }
     }

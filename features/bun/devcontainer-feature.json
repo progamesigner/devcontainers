@@ -1,15 +1,16 @@
 {
     "id": "bun",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Bun",
     "description": "Install Bun",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a Bun version to install"
         }
     },

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DENO_VERSION=${VERSION:-${1:-none}}
+DENO_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

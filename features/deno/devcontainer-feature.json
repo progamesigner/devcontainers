@@ -1,15 +1,16 @@
 {
     "id": "deno",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "Deno",
     "description": "Install Deno",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a Deno version to install"
         }
     },

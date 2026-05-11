@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-AWS_CLI_VERSION=${VERSION:-${1:-none}}
+AWS_CLI_VERSION=${VERSION:-${1:-latest}}
 
 AWS_CLI_SSM_PLUGIN=${SSM:-false}
 

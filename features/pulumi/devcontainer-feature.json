@@ -1,23 +1,25 @@
 {
     "id": "pulumi",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Pulumi",
     "description": "Install Pulumi",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a Pulumi version to install"
         },
         "crd2pulumi": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a crd2pulumi version to install"
         }
     }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BUN_VERSION=${VERSION:-${1:-none}}
+BUN_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

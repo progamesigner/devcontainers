@@ -1,15 +1,16 @@
 {
     "id": "blackbox",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "Blackbox",
     "description": "Install Blackbox",
     "options": {
         "version": {
             "type": "string",
             "proposals": [
+                "latest",
                 "none"
             ],
-            "default": "none",
+            "default": "latest",
             "description": "Select or enter a Blackbox version to install"
         }
     }

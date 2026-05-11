@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-HUGO_VERSION=${VERSION:-${1:-none}}
+HUGO_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

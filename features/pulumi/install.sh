@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-PULUMI_VERSION=${VERSION:-${1:-none}}
-CRD2PULUMI_VERSION=${CRD2PULUMI:-${2:-none}}
+PULUMI_VERSION=${VERSION:-${1:-latest}}
+CRD2PULUMI_VERSION=${CRD2PULUMI:-${2:-latest}}
 
 set -e
 

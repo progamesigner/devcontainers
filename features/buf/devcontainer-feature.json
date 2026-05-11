@@ -7,8 +7,8 @@
         "version": {
             "type": "string",
             "proposals": [
-                "none",
-                "latest"
+                "latest",
+                "none"
             ],
             "default": "latest",
             "description": "Select or enter a buf version to install"
