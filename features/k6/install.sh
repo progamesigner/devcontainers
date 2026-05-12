@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-K6_VERSION=${VERSION:-${1:-none}}
+K6_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

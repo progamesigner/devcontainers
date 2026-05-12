@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ACT_VERSION=${VERSION:-${1:-none}}
+ACT_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

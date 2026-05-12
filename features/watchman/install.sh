@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-WATCHMAN_VERSION=${VERSION:-${1:-none}}
+WATCHMAN_VERSION=${VERSION:-${1:-latest}}
 
 set -e
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BUF_VERSION=${VERSION:-${1:-none}}
+BUF_VERSION=${VERSION:-${1:-latest}}
 
 BUF_SHA256=${BUF_SHA256:-automatic}
 

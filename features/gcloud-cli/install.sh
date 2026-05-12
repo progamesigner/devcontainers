@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-GCLOUD_CLI_VERSION=${VERSION:-${1:-none}}
+GCLOUD_CLI_VERSION=${VERSION:-${1:-latest}}
 GCLOUD_ADDITIONAL_COMPONENTS=${COMPONENTS}
 
 set -e
