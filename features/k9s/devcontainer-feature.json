@@ -1,0 +1,17 @@
+{
+    "id": "k9s",
+    "version": "1.0.0",
+    "name": "k9s",
+    "description": "Install k9s",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a k9s version to install"
+        }
+    }
+}
