@@ -26,7 +26,7 @@ if [[ ${GCLOUD_CLI_VERSION} != none ]]; then
 
     if [[ ${GCLOUD_CLI_VERSION} = latest ]]; then
         curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-${ARCHITECTURE}.tar.gz
-    elif
+    else
         curl -sSL -o /tmp/gcloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-${GCLOUD_CLI_VERSION}-linux-${ARCHITECTURE}.tar.gz
     fi
 
