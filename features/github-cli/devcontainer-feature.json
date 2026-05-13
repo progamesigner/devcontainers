@@ -1,0 +1,17 @@
+{
+    "id": "github-cli",
+    "version": "1.0.0",
+    "name": "GitHub CLI",
+    "description": "Install GitHub CLI",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a GitHub CLI version to install"
+        }
+    }
+}
