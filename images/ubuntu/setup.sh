@@ -196,35 +196,41 @@ EOF
 )"
 
 if [[ ${USERNAME} = root ]]; then
-    USER_RC_PATH=/root
+    XDG_BASE_PATH=/root
 else
-    USER_RC_PATH=/home/${USERNAME}
+    XDG_BASE_PATH=/home/${USERNAME}
 fi
 
-if [[ ! -f ${USER_RC_PATH}/.bashrc || ! -s ${USER_RC_PATH}/.bashrc ]]; then
-    cp -v /etc/skel/.bashrc ${USER_RC_PATH}/.bashrc
+if [[ ! -f ${XDG_BASE_PATH}/.bashrc || ! -s ${XDG_BASE_PATH}/.bashrc ]]; then
+    cp -v /etc/skel/.bashrc ${XDG_BASE_PATH}/.bashrc
 fi
 
-if [[ ! -f ${USER_RC_PATH}/.profile || ! -s ${USER_RC_PATH}/.profile ]]; then
-    cp -v /etc/skel/.profile ${USER_RC_PATH}/.profile
+if [[ ! -f ${XDG_BASE_PATH}/.profile || ! -s ${XDG_BASE_PATH}/.profile ]]; then
+    cp -v /etc/skel/.profile ${XDG_BASE_PATH}/.profile
 fi
 
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
 echo "${SHELL_RC_SNIPPET}" >> /etc/zsh/zshrc
-echo "${USER_RC_SNIPPET}" >> ${USER_RC_PATH}/.bashrc
-echo 'export PROMPT_DIRTRIM=4' >> ${USER_RC_PATH}/.bashrc
+echo "${USER_RC_SNIPPET}" >> ${XDG_BASE_PATH}/.bashrc
+echo 'export PROMPT_DIRTRIM=4' >> ${XDG_BASE_PATH}/.bashrc
 if [[ ${USERNAME} != root ]]; then
     echo "${USER_RC_SNIPPET}" >> /root/.bashrc
     echo 'export PROMPT_DIRTRIM=4' >> /root/.bashrc
 fi
-chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.bashrc
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.bashrc
 
 # Create folders
-mkdir -p ${USER_RC_PATH}/.cache
-mkdir -p ${USER_RC_PATH}/.config
+mkdir -p ${XDG_BASE_PATH}/.cache
+mkdir -p ${XDG_BASE_PATH}/.config
+mkdir -p ${XDG_BASE_PATH}/.local/bin
+mkdir -p ${XDG_BASE_PATH}/.local/share
+mkdir -p ${XDG_BASE_PATH}/.local/state
 
-chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.cache
-chown -v ${USERNAME}:${USERNAME} ${USER_RC_PATH}/.config
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.cache
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.config
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/bin
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/share
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/state
 
 # Clean up
 apt-get autoremove --yes
