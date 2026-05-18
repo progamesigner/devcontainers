@@ -228,6 +228,7 @@ mkdir -p ${XDG_BASE_PATH}/.local/state
 
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.cache
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.config
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/bin
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/share
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.local/state
