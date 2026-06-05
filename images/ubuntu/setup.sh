@@ -212,10 +212,8 @@ fi
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
 echo "${SHELL_RC_SNIPPET}" >> /etc/zsh/zshrc
 echo "${USER_RC_SNIPPET}" >> ${XDG_BASE_PATH}/.bashrc
-echo 'export PROMPT_DIRTRIM=4' >> ${XDG_BASE_PATH}/.bashrc
 if [[ ${USERNAME} != root ]]; then
     echo "${USER_RC_SNIPPET}" >> /root/.bashrc
-    echo 'export PROMPT_DIRTRIM=4' >> /root/.bashrc
 fi
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.bashrc
 
