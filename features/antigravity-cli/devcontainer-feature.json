@@ -1,0 +1,20 @@
+{
+    "id": "antigravity-cli",
+    "version": "1.0.0",
+    "name": "Google Antigravity CLI",
+    "description": "Install Google Antigravity CLI",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter an Antigravity CLI version to install"
+        }
+    },
+    "containerEnv": {
+        "PATH": "${PATH}:/usr/local/share/antigravity-cli/bin"
+    }
+}
