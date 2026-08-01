@@ -1,6 +1,6 @@
 {
     "id": "docker",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "name": "Docker Client & Docker Compose",
     "description": "Install Docker Client & Docker Compose",
     "options": {
@@ -30,9 +30,20 @@
             ],
             "default": "latest",
             "description": "Select or enter a docker-compose version to install"
+        },
+        "socketUser": {
+            "type": "string",
+            "proposals": [
+                "automatic",
+                "root",
+                "vscode"
+            ],
+            "default": "automatic",
+            "description": "Select the user granted access to the mounted docker socket"
         }
     },
     "containerEnv": {
         "DOCKER_BUILDKIT": "1"
-    }
+    },
+    "entrypoint": "/usr/local/share/docker-init.sh"
 }

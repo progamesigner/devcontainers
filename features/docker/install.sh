@@ -3,6 +3,7 @@
 DOCKER_VERSION=${VERSION:-${1:-latest}}
 DOCKER_BUILDX_VERSION=${BUILDX:-${2:-latest}}
 DOCKER_COMPOSE_VERSION=${COMPOSE:-${3:-latest}}
+DOCKER_SOCKET_USER=${SOCKETUSER:-${4:-automatic}}
 
 DOCKER_SHA256=${DOCKER_SHA256:-automatic}
 
@@ -120,3 +121,49 @@ if [[ ${DOCKER_COMPOSE_VERSION} != none ]]; then
 
     echo "Done!"
 fi
+
+if [[ ${DOCKER_SOCKET_USER} = automatic ]]; then
+    DOCKER_SOCKET_USER=${_REMOTE_USER:-${_CONTAINER_USER:-root}}
+fi
+
+echo "$(cat << 'EOF'
+#!/usr/bin/env bash
+
+set -e
+
+DOCKER_SOCKET=/var/run/docker.sock
+DOCKER_SOCKET_USER="@USERNAME@"
+
+if [[ -S ${DOCKER_SOCKET} ]] && [[ ${DOCKER_SOCKET_USER} != root ]] && id "${DOCKER_SOCKET_USER}" > /dev/null 2>&1; then
+    ELEVATE=()
+    if [[ $(id -u) != 0 ]]; then
+        if command -v sudo > /dev/null && sudo -n true 2> /dev/null; then
+            ELEVATE=(sudo -n)
+        else
+            echo "Unable to grant ${DOCKER_SOCKET_USER} access to ${DOCKER_SOCKET}: root or passwordless sudo is required." >&2
+            exec "$@"
+        fi
+    fi
+
+    DOCKER_SOCKET_GID=$(stat -c '%g' "${DOCKER_SOCKET}")
+    DOCKER_GROUP=$(getent group "${DOCKER_SOCKET_GID}" | cut -d: -f1)
+
+    if [[ -z ${DOCKER_GROUP} ]]; then
+        if getent group docker > /dev/null; then
+            "${ELEVATE[@]}" groupmod --gid "${DOCKER_SOCKET_GID}" docker
+        else
+            "${ELEVATE[@]}" groupadd --gid "${DOCKER_SOCKET_GID}" docker
+        fi
+        DOCKER_GROUP=docker
+    fi
+
+    if ! id -nG "${DOCKER_SOCKET_USER}" | tr ' ' '\n' | grep -qx "${DOCKER_GROUP}"; then
+        "${ELEVATE[@]}" usermod --append --groups "${DOCKER_GROUP}" "${DOCKER_SOCKET_USER}"
+    fi
+fi
+
+exec "$@"
+EOF
+)" > /usr/local/share/docker-init.sh
+sed -i "s|@USERNAME@|${DOCKER_SOCKET_USER}|" /usr/local/share/docker-init.sh
+chmod +x /usr/local/share/docker-init.sh
