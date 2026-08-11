@@ -161,8 +161,6 @@ if [[ -S ${DOCKER_SOCKET} ]] && [[ ${DOCKER_SOCKET_USER} != root ]] && id "${DOC
         "${ELEVATE[@]}" usermod --append --groups "${DOCKER_GROUP}" "${DOCKER_SOCKET_USER}"
     fi
 fi
-
-exec "$@"
 EOF
 )" > /usr/local/share/docker-init.sh
 sed -i "s|@USERNAME@|${DOCKER_SOCKET_USER}|" /usr/local/share/docker-init.sh
