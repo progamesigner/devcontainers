@@ -1,6 +1,6 @@
 {
     "id": "claude-code",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Claude Code",
     "description": "Install Claude Code",
     "installsAfter": [
@@ -13,5 +13,6 @@
                 "Anthropic.claude-code"
             ]
         }
-    }
+    },
+    "entrypoint": "/usr/local/share/claude-code-init.sh"
 }
