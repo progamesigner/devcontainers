@@ -10,6 +10,10 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
+BUILD_PACKAGES=" \
+    bubblewrap \
+"
+
 echo "Setup Codex ..."
 
 if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
@@ -17,6 +21,14 @@ if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
     exit 1
 fi
 
+apt-get update
+apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
+apt-get upgrade --no-install-recommends --yes
+
 npm install -g @openai/codex
+
+apt-get autoremove --yes
+apt-get clean --yes
+rm -rf /var/lib/apt/lists/*
 
 echo "Done!"
