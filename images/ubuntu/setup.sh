@@ -210,12 +210,20 @@ if [[ ! -f ${XDG_BASE_PATH}/.profile || ! -s ${XDG_BASE_PATH}/.profile ]]; then
 fi
 
 echo "${SHELL_RC_SNIPPET}" >> /etc/bash.bashrc
-echo "${SHELL_RC_SNIPPET}" >> /etc/zsh/zshrc
 echo "${USER_RC_SNIPPET}" >> ${XDG_BASE_PATH}/.bashrc
 if [[ ${USERNAME} != root ]]; then
     echo "${USER_RC_SNIPPET}" >> /root/.bashrc
 fi
 chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.bashrc
+
+echo "${SHELL_RC_SNIPPET}" >> /etc/zsh/zshrc
+echo "${USER_RC_SNIPPET}" >> ${XDG_BASE_PATH}/.zshrc
+if [[ ${USERNAME} != root ]]; then
+    echo "${USER_RC_SNIPPET}" >> /root/.zshrc
+fi
+chown -v ${USERNAME}:${USERNAME} ${XDG_BASE_PATH}/.zshrc
+
+chsh -s $(which zsh) vscode
 
 # Create folders
 mkdir -p ${XDG_BASE_PATH}/.cache
