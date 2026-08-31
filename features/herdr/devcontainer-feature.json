@@ -1,6 +1,6 @@
 {
     "id": "herdr",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "name": "Herdr",
     "description": "Install Herdr and bridge its pane socket(s) in from the Docker host over SSH",
     "options": {
@@ -20,13 +20,18 @@
         },
         "remoteUser": {
             "type": "string",
-            "default": "vscode",
+            "default": "",
             "description": "The username to SSH into for the socket bridge. Leave empty to disable the bridge even if `bridge` is true."
         },
         "remoteHost": {
             "type": "string",
             "default": "host.docker.internal",
             "description": "Hostname of the Docker host, reachable from inside the container"
+        },
+        "remoteHome": {
+            "type": "string",
+            "default": "",
+            "description": "Home directory of the remote user on the Docker host"
         },
         "privateKeyPath": {
             "type": "string",

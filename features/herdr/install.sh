@@ -4,7 +4,8 @@ HERDR_VERSION=${VERSION:-${1:-latest}}
 HERDR_BRIDGE=${BRIDGE:-${2:-true}}
 HERDR_REMOTE_USER=${REMOTEUSER:-${3:-}}
 HERDR_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
-HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${5:-/var/run/secrets/herdr-devcontainer-bridge/key}}
+HERDR_REMOTE_HOME=${REMOTEHOME:-${5:-/Users/${HERDR_REMOTE_USER}}}
+HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${6:-/var/run/secrets/herdr-devcontainer-bridge/key}}
 
 set -e
 
@@ -102,6 +103,7 @@ HERDR_BRIDGE_DIR=$1
 HERDR_BRIDGE_REMOTE=$2
 
 HERDR_PRIVATE_KEY_SRC=@HERDR_PRIVATE_KEY_PATH@
+HERDR_REMOTE_HOME=@HERDR_REMOTE_HOME@
 HERDR_REMOTE_HOST=@HERDR_REMOTE_HOST@
 HERDR_REMOTE_USER=@HERDR_REMOTE_USER@
 
@@ -118,28 +120,12 @@ chmod 777 ${HERDR_BRIDGE_DIR}
 
 (
     set +e
-    HERDR_REMOTE_HOME=""
     while true; do
         set --
         if [ -f ${HERDR_PRIVATE_KEY_SRC} ]; then
             cp ${HERDR_PRIVATE_KEY_SRC} ${HERDR_BRIDGE_KEY} 2>/dev/null \
                 && chmod 600 ${HERDR_BRIDGE_KEY} 2>/dev/null \
                 && set -- -i ${HERDR_BRIDGE_KEY}
-        fi
-
-        if [ -z "${HERDR_REMOTE_HOME}" ]; then
-            HERDR_REMOTE_HOME=$(ssh \
-                -o BatchMode=yes \
-                -o StrictHostKeyChecking=accept-new \
-                -o UserKnownHostsFile=${HERDR_BRIDGE_KNOWN_HOSTS} \
-                "$@" \
-                ${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST} \
-                'echo $HOME' 2>> ${HERDR_BRIDGE_LOG})
-        fi
-
-        if [ -z "${HERDR_REMOTE_HOME}" ]; then
-            sleep 1
-            continue
         fi
 
         rm -f ${HERDR_BRIDGE_SOCKET}
@@ -168,6 +154,7 @@ EOF
     sed -i \
         -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
         -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
+        -e "s|@HERDR_REMOTE_HOME@|${HERDR_REMOTE_HOME}|g" \
         -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
         /usr/local/share/herdr-bridge.sh
     chmod +x /usr/local/share/herdr-bridge.sh
