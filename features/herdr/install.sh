@@ -2,7 +2,9 @@
 
 HERDR_VERSION=${VERSION:-${1:-latest}}
 HERDR_BRIDGE=${BRIDGE:-${2:-true}}
-HERDR_BRIDGE_PORT=${BRIDGEPORT:-${3:-47990}}
+HERDR_REMOTE_USER=${REMOTEUSER:-${3:-}}
+HERDR_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
+HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${5:-/run/secrets/herdr_bridge_key}}
 
 set -e
 
@@ -45,43 +47,69 @@ if [[ ${HERDR_VERSION} != none ]]; then
     echo "Done!"
 fi
 
-# Bridge the host's HERDR_SOCKET_PATH Unix socket into the container.
+# The feature always declares this path as its entrypoint (devcontainer.json
+# doesn't support conditional entrypoints), so a placeholder must exist even
+# when the bridge below is skipped — otherwise container start fails looking
+# for a file that was never written.
+cat << 'EOF' > /usr/local/share/herdr-init.sh
+#!/bin/sh
+# herdr socket bridge disabled: no remoteUser was set, or bridge=false.
+EOF
+chmod +x /usr/local/share/herdr-init.sh
+
+# Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over SSH.
 #
 # On Docker Desktop/OrbStack-style setups the container runs in a separate
 # VM/kernel from the host, so a bind-mounted copy of the host's herdr.sock
 # is just a stale file — connecting to it returns ECONNREFUSED, since a Unix
-# domain socket is a live kernel object, not just file bytes. Bridging it
-# over TCP via host.docker.internal, with a matching socat listener on the
-# host side, is the only reliable way to reach it. See
+# domain socket is a live kernel object, not just file bytes. OpenSSH's
+# `-L localsocket:remotesocket` forwards an actual Unix-socket-to-Unix-socket
+# tunnel over the ssh connection, which does cross the boundary. This needs
+# Remote Login (sshd) enabled on the macOS host, plus a dedicated,
+# forwarding-only key — see
 # https://gist.github.com/progamesigner/0f90551cabaaf54ccc8407fe9944c9c9
-# for the paired host-side LaunchAgent that this expects to be listening on
-# HERDR_BRIDGE_PORT.
-if [[ ${HERDR_BRIDGE} = true ]]; then
+# for how to generate and restrict it, and how to bind-mount the private key
+# into the container at privateKeyPath.
+if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
     echo "Setup Herdr socket bridge ..."
 
-    if ! command -v socat > /dev/null 2>&1; then
+    if ! command -v ssh > /dev/null 2>&1; then
         apt-get update -y
-        apt-get install -y socat
+        apt-get install -y openssh-client
         rm -rf /var/lib/apt/lists/*
     fi
 
     cat << 'EOF' > /usr/local/share/herdr-init.sh
 #!/bin/sh
 
-HERDR_BRIDGE_PORT="@HERDR_BRIDGE_PORT@"
+HERDR_REMOTE_USER="@HERDR_REMOTE_USER@"
+HERDR_REMOTE_HOST="@HERDR_REMOTE_HOST@"
+HERDR_PRIVATE_KEY_SRC="@HERDR_PRIVATE_KEY_PATH@"
+HERDR_PRIVATE_KEY="/tmp/herdr-bridge-key"
 HERDR_BRIDGE_SOCKET="/tmp/herdr-bridge.sock"
+HERDR_BRIDGE_KNOWN_HOSTS="/tmp/herdr-bridge-known-hosts"
 HERDR_BRIDGE_LOG="/tmp/herdr-bridge.log"
 
-# Best-effort: never let the bridge block or fail container startup. A dead
-# host-side LaunchAgent, or a container run outside of a herdr pane, just
-# means HERDR_SOCKET_PATH stays unreachable and the hooks that use it no-op,
-# same as if this feature weren't installed at all.
-if command -v socat > /dev/null 2>&1; then
+# Best-effort: never let the bridge block or fail container startup. A
+# missing/unreadable private key, or a container run outside of a herdr
+# pane, just means HERDR_SOCKET_PATH stays unreachable and the hooks that
+# use it no-op, same as if this feature weren't installed at all.
+if command -v ssh > /dev/null 2>&1 && [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
+    cp "${HERDR_PRIVATE_KEY_SRC}" "${HERDR_PRIVATE_KEY}"
+    chmod 600 "${HERDR_PRIVATE_KEY}"
     rm -f "${HERDR_BRIDGE_SOCKET}"
     (
         while true; do
-            socat UNIX-LISTEN:"${HERDR_BRIDGE_SOCKET}",fork,unlink-early,mode=666 \
-                TCP:host.docker.internal:"${HERDR_BRIDGE_PORT}" \
+            ssh -N \
+                -o ExitOnForwardFailure=yes \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=3 \
+                -o StrictHostKeyChecking=accept-new \
+                -o UserKnownHostsFile="${HERDR_BRIDGE_KNOWN_HOSTS}" \
+                -o StreamLocalBindUnlink=yes \
+                -i "${HERDR_PRIVATE_KEY}" \
+                -L "${HERDR_BRIDGE_SOCKET}:/Users/${HERDR_REMOTE_USER}/.config/herdr/herdr.sock" \
+                "${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST}" \
                 >> "${HERDR_BRIDGE_LOG}" 2>&1
             sleep 1
         done
@@ -90,7 +118,9 @@ if command -v socat > /dev/null 2>&1; then
 fi
 EOF
     sed -i \
-        -e "s|@HERDR_BRIDGE_PORT@|${HERDR_BRIDGE_PORT}|g" \
+        -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
+        -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
+        -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
         /usr/local/share/herdr-init.sh
     chmod +x /usr/local/share/herdr-init.sh
 

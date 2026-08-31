@@ -2,7 +2,7 @@
     "id": "herdr",
     "version": "1.1.0",
     "name": "Herdr",
-    "description": "Install Herdr and bridge its pane socket in from the Docker host",
+    "description": "Install Herdr and bridge its pane socket in from the Docker host over SSH",
     "options": {
         "version": {
             "type": "string",
@@ -16,12 +16,22 @@
         "bridge": {
             "type": "boolean",
             "default": true,
-            "description": "Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over host.docker.internal, so hooks/plugins that report agent state can reach it. Needed on Docker Desktop/OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount."
+            "description": "Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over SSH, so hooks/plugins that report agent state can reach it. Needed on Docker Desktop/OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount. Requires Remote Login (sshd) enabled on the host and remoteUser set."
         },
-        "bridgePort": {
+        "remoteUser": {
             "type": "string",
-            "default": "47990",
-            "description": "TCP port the host-side socat bridge listens on (must match the port used by the herdr-socket-bridge LaunchAgent on the host)"
+            "default": "",
+            "description": "macOS username to SSH into for the socket bridge. Leave empty to disable the bridge even if `bridge` is true."
+        },
+        "remoteHost": {
+            "type": "string",
+            "default": "host.docker.internal",
+            "description": "Hostname of the Docker host, reachable from inside the container"
+        },
+        "privateKeyPath": {
+            "type": "string",
+            "default": "/run/secrets/herdr_bridge_key",
+            "description": "Path inside the container where the dedicated bridge SSH private key is bind-mounted (see the feature README for how to generate and restrict it)"
         }
     },
     "containerEnv": {
