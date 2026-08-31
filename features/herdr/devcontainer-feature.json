@@ -1,8 +1,8 @@
 {
     "id": "herdr",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "name": "Herdr",
-    "description": "Install Herdr",
+    "description": "Install Herdr and bridge its pane socket in from the Docker host",
     "options": {
         "version": {
             "type": "string",
@@ -12,6 +12,21 @@
             ],
             "default": "latest",
             "description": "Select or enter a Herdr version to install"
+        },
+        "bridge": {
+            "type": "boolean",
+            "default": true,
+            "description": "Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over host.docker.internal, so hooks/plugins that report agent state can reach it. Needed on Docker Desktop/OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount."
+        },
+        "bridgePort": {
+            "type": "string",
+            "default": "47990",
+            "description": "TCP port the host-side socat bridge listens on (must match the port used by the herdr-socket-bridge LaunchAgent on the host)"
         }
-    }
+    },
+    "containerEnv": {
+        "HERDR_ENV": "1",
+        "HERDR_SOCKET_PATH": "/tmp/herdr-bridge.sock"
+    },
+    "entrypoint": "/usr/local/share/herdr-init.sh"
 }
