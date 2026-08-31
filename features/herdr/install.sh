@@ -5,7 +5,6 @@ HERDR_BRIDGE=${BRIDGE:-${2:-true}}
 HERDR_REMOTE_USER=${REMOTEUSER:-${3:-}}
 HERDR_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
 HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${5:-/run/secrets/herdr_bridge_key}}
-HERDR_SESSIONS=${SESSIONS:-${6:-}}
 
 set -e
 
@@ -70,18 +69,42 @@ chmod +x /usr/local/share/herdr-init.sh
 # authenticated user's home directory) — confirmed live: a garbage remote
 # path is rejected by the local ssh client before it even connects, but
 # `~/.config/herdr/herdr.sock` is accepted and passed through to the server.
-# This needs Remote Login (sshd) enabled on the macOS host, plus a
-# dedicated, forwarding-only key — see
+# This needs Remote Login (sshd) enabled on the macOS host — see
 # https://gist.github.com/progamesigner/0f90551cabaaf54ccc8407fe9944c9c9
-# for how to generate and restrict it, and how to bind-mount the private key
-# into the container at privateKeyPath.
+# for a walkthrough (a dedicated, forwarding-only key is recommended there,
+# but see below: it is not required).
 #
-# `sessions` is a comma-separated list of herdr named-session names
-# (`herdr --session <name>`), each bridged as its own -L on the same ssh
-# connection: local /tmp/herdr-bridge-<name>.sock -> remote
-# ~/.config/herdr/sessions/<name>/herdr.sock. The default/unnamed session
-# (~/.config/herdr/herdr.sock) is always bridged to /tmp/herdr-bridge.sock,
-# regardless of `sessions`.
+# The private key is OPTIONAL. `privateKeyPath` is only used if a file
+# actually exists there at container start; if not, ssh is invoked without
+# `-i` and falls back to whatever auth is otherwise available (an agent
+# forwarded via SSH_AUTH_SOCK, a default ~/.ssh/id_* the image happens to
+# have, etc.) — same best-effort story as everything else here: no working
+# auth just means HERDR_SOCKET_PATH stays unreachable and the hooks that use
+# it no-op. `-o BatchMode=yes` guarantees this fails fast instead of hanging
+# on a password prompt, and the key file is (re-)checked every retry
+# iteration, not just once at container start, so mounting a key in later
+# gets picked up without recreating the container.
+#
+# Sockets are bridged to inside the container's own
+# `<remote-user-home>/.config/herdr/`, mirroring the host's own default
+# layout — not some throwaway /tmp path — so anything that resolves herdr's
+# default socket path itself (the `herdr` CLI's own client mode, not just
+# these hooks) finds it with no HERDR_SOCKET_PATH override needed. The
+# actual container user's home directory has to be resolved at container
+# build time via `_REMOTE_USER_HOME` (baked in below) rather than read as
+# `$HOME` inside the entrypoint script, because the entrypoint may run as
+# root regardless of which user `docker exec` sessions run as — `$HOME`
+# would then resolve to /root, not the real dev user's home.
+#
+# HERDR_SESSIONS (a comma-separated list of herdr named-session names, from
+# `herdr --session <name>`) is read directly from the container's own
+# runtime environment inside the entrypoint script — it is NOT a Feature
+# option baked in at image build time. Set it in your docker-compose.yml's
+# `environment:` for the dev container service (or devcontainer.json's own
+# top-level `containerEnv`/`remoteEnv`) and it takes effect on container
+# recreate, with no image rebuild needed. Each named session bridges to its
+# own <home>/.config/herdr/sessions/<name>/herdr.sock; the default/unnamed
+# session is always bridged to <home>/.config/herdr/herdr.sock regardless.
 if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
     echo "Setup Herdr socket bridge ..."
 
@@ -97,61 +120,84 @@ if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
 HERDR_REMOTE_USER="@HERDR_REMOTE_USER@"
 HERDR_REMOTE_HOST="@HERDR_REMOTE_HOST@"
 HERDR_PRIVATE_KEY_SRC="@HERDR_PRIVATE_KEY_PATH@"
-HERDR_SESSIONS="@HERDR_SESSIONS@"
+HERDR_CONTAINER_HOME="@HERDR_CONTAINER_HOME@"
 HERDR_PRIVATE_KEY="/tmp/herdr-bridge-key"
+HERDR_BRIDGE_DIR="${HERDR_CONTAINER_HOME}/.config/herdr"
 HERDR_BRIDGE_KNOWN_HOSTS="/tmp/herdr-bridge-known-hosts"
 HERDR_BRIDGE_LOG="/tmp/herdr-bridge.log"
 
-# Best-effort: never let the bridge block or fail container startup. A
-# missing/unreadable private key, or a container run outside of a herdr
-# pane, just means HERDR_SOCKET_PATH stays unreachable and the hooks that
-# use it no-op, same as if this feature weren't installed at all.
-if command -v ssh > /dev/null 2>&1 && [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
-    cp "${HERDR_PRIVATE_KEY_SRC}" "${HERDR_PRIVATE_KEY}"
-    chmod 600 "${HERDR_PRIVATE_KEY}"
-
-    rm -f /tmp/herdr-bridge.sock
-    set -- -L /tmp/herdr-bridge.sock:~/.config/herdr/herdr.sock
-
-    OLD_IFS="${IFS}"
-    IFS=","
-    for raw_name in ${HERDR_SESSIONS}; do
-        IFS="${OLD_IFS}"
-        # trim leading/trailing whitespace, so "work, personal" (space after
-        # the comma) doesn't end up as a literal " personal" socket path
-        name="${raw_name#"${raw_name%%[![:space:]]*}"}"
-        name="${name%"${name##*[![:space:]]}"}"
-        [ -n "${name}" ] || continue
-        rm -f "/tmp/herdr-bridge-${name}.sock"
-        set -- "$@" -L "/tmp/herdr-bridge-${name}.sock:~/.config/herdr/sessions/${name}/herdr.sock"
-        IFS=","
-    done
-    IFS="${OLD_IFS}"
-
-    (
-        while true; do
-            ssh -N \
-                -o ExitOnForwardFailure=yes \
-                -o ServerAliveInterval=15 \
-                -o ServerAliveCountMax=3 \
-                -o StrictHostKeyChecking=accept-new \
-                -o UserKnownHostsFile="${HERDR_BRIDGE_KNOWN_HOSTS}" \
-                -o StreamLocalBindUnlink=yes \
-                -i "${HERDR_PRIVATE_KEY}" \
-                "$@" \
-                "${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST}" \
-                >> "${HERDR_BRIDGE_LOG}" 2>&1
-            sleep 1
-        done
-    ) &
-    disown
+# Best-effort: never let the bridge block or fail container startup.
+if ! command -v ssh > /dev/null 2>&1; then
+    exit 0
 fi
+
+mkdir -p "${HERDR_BRIDGE_DIR}"
+chmod 777 "${HERDR_BRIDGE_DIR}"
+
+(
+    while true; do
+        set --
+        if [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
+            cp "${HERDR_PRIVATE_KEY_SRC}" "${HERDR_PRIVATE_KEY}" 2>/dev/null \
+                && chmod 600 "${HERDR_PRIVATE_KEY}" 2>/dev/null \
+                && set -- -i "${HERDR_PRIVATE_KEY}"
+        fi
+
+        rm -f "${HERDR_BRIDGE_DIR}/herdr.sock"
+        set -- "$@" -L "${HERDR_BRIDGE_DIR}/herdr.sock:~/.config/herdr/herdr.sock"
+        SOCKET_PATHS="${HERDR_BRIDGE_DIR}/herdr.sock"
+
+        OLD_IFS="${IFS}"
+        IFS=","
+        for raw_name in ${HERDR_SESSIONS:-}; do
+            IFS="${OLD_IFS}"
+            # trim leading/trailing whitespace, so "work, personal" (space
+            # after the comma) doesn't end up as a literal " personal"
+            # socket path
+            name="${raw_name#"${raw_name%%[![:space:]]*}"}"
+            name="${name%"${name##*[![:space:]]}"}"
+            [ -n "${name}" ] || continue
+            mkdir -p "${HERDR_BRIDGE_DIR}/sessions/${name}"
+            chmod 777 "${HERDR_BRIDGE_DIR}/sessions/${name}"
+            rm -f "${HERDR_BRIDGE_DIR}/sessions/${name}/herdr.sock"
+            set -- "$@" -L "${HERDR_BRIDGE_DIR}/sessions/${name}/herdr.sock:~/.config/herdr/sessions/${name}/herdr.sock"
+            SOCKET_PATHS="${SOCKET_PATHS} ${HERDR_BRIDGE_DIR}/sessions/${name}/herdr.sock"
+            IFS=","
+        done
+        IFS="${OLD_IFS}"
+
+        ssh -N \
+            -o BatchMode=yes \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=3 \
+            -o StrictHostKeyChecking=accept-new \
+            -o UserKnownHostsFile="${HERDR_BRIDGE_KNOWN_HOSTS}" \
+            -o StreamLocalBindUnlink=yes \
+            "$@" \
+            "${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST}" \
+            >> "${HERDR_BRIDGE_LOG}" 2>&1 &
+        SSH_PID=$!
+
+        # The entrypoint may run as root regardless of which (non-root) user
+        # later `docker exec` sessions run as; ssh creates each local socket
+        # owned by whoever ran it, so without this those sessions would get
+        # EACCES connecting to a root-owned, ssh-default-mode socket.
+        sleep 1
+        for path in ${SOCKET_PATHS}; do
+            chmod 666 "${path}" 2>/dev/null
+        done
+
+        wait "${SSH_PID}" 2>/dev/null
+        sleep 1
+    done
+) &
 EOF
     sed -i \
         -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
         -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
         -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
-        -e "s|@HERDR_SESSIONS@|${HERDR_SESSIONS}|g" \
+        -e "s|@HERDR_CONTAINER_HOME@|${_REMOTE_USER_HOME}|g" \
         /usr/local/share/herdr-init.sh
     chmod +x /usr/local/share/herdr-init.sh
 

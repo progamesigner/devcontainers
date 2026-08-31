@@ -1,8 +1,8 @@
 {
     "id": "herdr",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "Herdr",
-    "description": "Install Herdr and bridge its pane socket in from the Docker host over SSH",
+    "description": "Install Herdr and bridge its pane socket(s) in from the Docker host over SSH",
     "options": {
         "version": {
             "type": "string",
@@ -16,7 +16,7 @@
         "bridge": {
             "type": "boolean",
             "default": true,
-            "description": "Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over SSH, so hooks/plugins that report agent state can reach it. Needed on Docker Desktop/OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount. Requires Remote Login (sshd) enabled on the host and remoteUser set."
+            "description": "Bridge the host's herdr Unix socket(s) into the container over SSH, into <remote-user-home>/.config/herdr/, mirroring the host's own layout. Needed on Docker Desktop/OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount. Requires Remote Login (sshd) enabled on the host and remoteUser set."
         },
         "remoteUser": {
             "type": "string",
@@ -31,17 +31,11 @@
         "privateKeyPath": {
             "type": "string",
             "default": "/run/secrets/herdr_bridge_key",
-            "description": "Path inside the container where the dedicated bridge SSH private key is bind-mounted (see the feature README for how to generate and restrict it)"
-        },
-        "sessions": {
-            "type": "string",
-            "default": "",
-            "description": "Comma-separated herdr named-session names (from `herdr --session <name>`) to also bridge, each at /tmp/herdr-bridge-<name>.sock. The default/unnamed session is always bridged at /tmp/herdr-bridge.sock regardless of this option."
+            "description": "Path inside the container where a dedicated bridge SSH private key would be bind-mounted, IF you use one. Optional: if no file exists at this path when the container starts, ssh runs without -i and falls back to whatever auth is otherwise available (e.g. an agent forwarded via SSH_AUTH_SOCK). Re-checked on every reconnect attempt, not just once at container start."
         }
     },
     "containerEnv": {
-        "HERDR_ENV": "1",
-        "HERDR_SOCKET_PATH": "/tmp/herdr-bridge.sock"
+        "HERDR_ENV": "1"
     },
     "entrypoint": "/usr/local/share/herdr-init.sh"
 }
