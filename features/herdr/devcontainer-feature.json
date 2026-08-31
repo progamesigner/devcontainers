@@ -1,8 +1,8 @@
 {
     "id": "herdr",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "name": "Herdr",
-    "description": "Install Herdr",
+    "description": "Install Herdr and bridge its pane socket(s) in from the Docker host over SSH",
     "options": {
         "version": {
             "type": "string",
@@ -12,6 +12,27 @@
             ],
             "default": "latest",
             "description": "Select or enter a Herdr version to install"
+        },
+        "bridge": {
+            "type": "boolean",
+            "default": true,
+            "description": "Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over SSH, so hooks / plugins that report agent state can reach it. Needed on Docker Desktop / OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount. Requires Remote Login (sshd) enabled on the host and remoteUser set."
+        },
+        "remoteUser": {
+            "type": "string",
+            "default": "",
+            "description": "The username to SSH into for the socket bridge. Leave empty to disable the bridge even if `bridge` is true."
+        },
+        "remoteHost": {
+            "type": "string",
+            "default": "host.docker.internal",
+            "description": "Hostname of the Docker host, reachable from inside the container"
+        },
+        "privateKeyPath": {
+            "type": "string",
+            "default": "/var/run/secrets/herdr-devcontainer-bridge/key",
+            "description": "Path inside the container where a dedicated bridge SSH private key would be bind-mounted, IF you use one. Optional: if no file exists at this path when the container starts, ssh runs without -i and falls back to whatever auth is otherwise available (e.g. an agent forwarded via SSH_AUTH_SOCK). Re-checked on every reconnect attempt, not just once at container start."
         }
-    }
+    },
+    "entrypoint": "/usr/local/share/herdr-init.sh"
 }
