@@ -63,7 +63,7 @@ if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
 
 set -e
 
-/usr/local/share/herdr-bridge.sh ${_REMOTE_USER_HOME}/.config/herdr "~/.config/herdr/herdr.sock"
+/usr/local/share/herdr-bridge.sh ${_REMOTE_USER_HOME}/.config/herdr .config/herdr/herdr.sock
 EOF
     chmod +x /usr/local/share/herdr-init.sh
 
@@ -75,10 +75,10 @@ set -e
 HERDR_SESSION=${HERDR_SESSION:-}
 if [ -n "${HERDR_SESSION}" ]; then
     HERDR_BRIDGE_DIR=${HOME}/.config/herdr/sessions/${HERDR_SESSION}
-    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} "~/.config/herdr/sessions/${HERDR_SESSION}/herdr.sock"
+    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} .config/herdr/sessions/${HERDR_SESSION}/herdr.sock
 else
     HERDR_BRIDGE_DIR=${HOME}/.config/herdr
-    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} "~/.config/herdr/herdr.sock"
+    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} .config/herdr/herdr.sock
 fi
 
 export HERDR_ENV=1
@@ -118,12 +118,28 @@ chmod 777 ${HERDR_BRIDGE_DIR}
 
 (
     set +e
+    HERDR_REMOTE_HOME=""
     while true; do
         set --
         if [ -f ${HERDR_PRIVATE_KEY_SRC} ]; then
             cp ${HERDR_PRIVATE_KEY_SRC} ${HERDR_BRIDGE_KEY} 2>/dev/null \
                 && chmod 600 ${HERDR_BRIDGE_KEY} 2>/dev/null \
                 && set -- -i ${HERDR_BRIDGE_KEY}
+        fi
+
+        if [ -z "${HERDR_REMOTE_HOME}" ]; then
+            HERDR_REMOTE_HOME=$(ssh \
+                -o BatchMode=yes \
+                -o StrictHostKeyChecking=accept-new \
+                -o UserKnownHostsFile=${HERDR_BRIDGE_KNOWN_HOSTS} \
+                "$@" \
+                ${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST} \
+                'echo $HOME' 2>> ${HERDR_BRIDGE_LOG})
+        fi
+
+        if [ -z "${HERDR_REMOTE_HOME}" ]; then
+            sleep 1
+            continue
         fi
 
         rm -f ${HERDR_BRIDGE_SOCKET}
@@ -136,7 +152,7 @@ chmod 777 ${HERDR_BRIDGE_DIR}
             -o UserKnownHostsFile=${HERDR_BRIDGE_KNOWN_HOSTS} \
             -o StreamLocalBindUnlink=yes \
             $@ \
-            -L ${HERDR_BRIDGE_SOCKET}:${HERDR_BRIDGE_REMOTE} \
+            -L ${HERDR_BRIDGE_SOCKET}:${HERDR_REMOTE_HOME}/${HERDR_BRIDGE_REMOTE} \
             ${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST} \
             >> ${HERDR_BRIDGE_LOG} 2>&1 &
         SSH_PID=$!
