@@ -201,5 +201,112 @@ EOF
         /usr/local/share/herdr-init.sh
     chmod +x /usr/local/share/herdr-init.sh
 
+    # /usr/local/bin/herdr-devcontainer: an exec-time wrapper, for use as
+    # `docker exec ... herdr-devcontainer <cmd> [args...]` instead of just
+    # `docker exec ... <cmd> [args...]`. Unlike herdr-init.sh (which runs
+    # once at container start, typically as root, and only knows the real
+    # dev user's home via the build-time _REMOTE_USER_HOME baked in above),
+    # this runs as whichever user `docker exec` actually specifies — the
+    # same user about to run <cmd> — so its own $HOME is already correct
+    # with no baked-in value needed, and any socket it creates is already
+    # owned by the right user with no chmod-after-the-fact workaround.
+    #
+    # It only covers the default/unnamed session (matching herdr-init.sh's
+    # always-on default bridge, not the HERDR_SESSIONS list) and only starts
+    # its own bridge if one isn't already up, checked by whether
+    # <home>/.config/herdr/herdr.sock already exists as a socket — not a pid
+    # file: herdr-init.sh's bridge runs as root, this script runs as
+    # whichever (non-root) user `docker exec` specifies, and kill -0 against
+    # a process owned by a different, more-privileged user always returns
+    # EPERM — indistinguishable from "doesn't exist" — so a pid-based check
+    # would always wrongly conclude nothing is running. It always exports
+    # HERDR_ENV/HERDR_SOCKET_PATH itself, so callers no longer need to pass
+    # those two via `docker exec -e`.
+    cat << 'EOF' > /usr/local/bin/herdr-devcontainer
+#!/usr/bin/env bash
+
+set -e
+
+HERDR_REMOTE_USER="@HERDR_REMOTE_USER@"
+HERDR_REMOTE_HOST="@HERDR_REMOTE_HOST@"
+HERDR_PRIVATE_KEY_SRC="@HERDR_PRIVATE_KEY_PATH@"
+HERDR_PRIVATE_KEY="/tmp/herdr-bridge-key-$$"
+HERDR_BRIDGE_DIR="${HOME}/.config/herdr"
+HERDR_BRIDGE_SOCKET="${HERDR_BRIDGE_DIR}/herdr.sock"
+# Own, uid-scoped paths — never the entrypoint's shared /tmp/herdr-bridge.*.
+# Those are root-owned, and /tmp's sticky bit means a non-root
+# `docker exec` user (which is who actually runs this) can't write or
+# overwrite them even though /tmp itself is world-writable.
+HERDR_BRIDGE_KNOWN_HOSTS="/tmp/herdr-bridge-known-hosts-$(id -u)"
+HERDR_BRIDGE_LOG="/tmp/herdr-bridge-$(id -u).log"
+
+export HERDR_ENV=1
+export HERDR_SOCKET_PATH="${HERDR_BRIDGE_SOCKET}"
+
+# Whether *anyone's* bridge (herdr-init.sh's, or an earlier
+# herdr-devcontainer's) already put a live socket at the default path.
+# Deliberately not a pid-file/kill-based check: herdr-init.sh's bridge runs
+# as root, this script runs as the target (non-root) `docker exec` user,
+# and kill -0 against a process owned by a different, more-privileged user
+# always returns EPERM — indistinguishable from "doesn't exist" — so it
+# would always wrongly conclude nothing is running.
+bridge_running() {
+    [ -S "${HERDR_BRIDGE_SOCKET}" ]
+}
+
+if command -v ssh > /dev/null 2>&1 && ! bridge_running; then
+    mkdir -p "${HERDR_BRIDGE_DIR}"
+    (
+        # set -e is inherited from the outer script into this subshell —
+        # confirmed live: left enabled, the *first* failed ssh attempt
+        # (e.g. the host unreachable) kills this whole retry loop on the
+        # spot, silently, without even reaching the first `sleep 1`. The
+        # entire point of this loop is surviving ssh failures, so disable
+        # it here.
+        set +e
+        while true; do
+            IDENTITY=()
+            if [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
+                cp "${HERDR_PRIVATE_KEY_SRC}" "${HERDR_PRIVATE_KEY}" 2>/dev/null \
+                    && chmod 600 "${HERDR_PRIVATE_KEY}" 2>/dev/null \
+                    && IDENTITY=(-i "${HERDR_PRIVATE_KEY}")
+            fi
+
+            rm -f "${HERDR_BRIDGE_SOCKET}"
+            ssh -N \
+                -o BatchMode=yes \
+                -o ExitOnForwardFailure=yes \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=3 \
+                -o StrictHostKeyChecking=accept-new \
+                -o UserKnownHostsFile="${HERDR_BRIDGE_KNOWN_HOSTS}" \
+                -o StreamLocalBindUnlink=yes \
+                "${IDENTITY[@]}" \
+                -L "${HERDR_BRIDGE_SOCKET}:~/.config/herdr/herdr.sock" \
+                "${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST}" \
+                >> "${HERDR_BRIDGE_LOG}" 2>&1
+            sleep 1
+        done
+    ) &
+    disown
+
+    # give the freshly-started bridge a moment to come up before handing
+    # off — best-effort, not a hard guarantee; the hooks that use the
+    # socket already no-op harmlessly if it isn't there yet.
+    for _ in 1 2 3 4 5; do
+        [ -S "${HERDR_BRIDGE_SOCKET}" ] && break
+        sleep 0.2
+    done
+fi
+
+exec "$@"
+EOF
+    sed -i \
+        -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
+        -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
+        -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
+        /usr/local/bin/herdr-devcontainer
+    chmod +x /usr/local/bin/herdr-devcontainer
+
     echo "Done!"
 fi
