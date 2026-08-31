@@ -26,7 +26,7 @@ cat << 'EOF' > /usr/local/share/claude-code-init.sh
 
 set -e
 
-CLAUDE_HOME="@CLAUDE_HOME@"
+CLAUDE_HOME=@CLAUDE_HOME@
 
 mkdir -p $CLAUDE_HOME/.claude
 if [ ! -e $CLAUDE_HOME/.claude/.claude.json ]; then

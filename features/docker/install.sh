@@ -132,7 +132,7 @@ cat << 'EOF' > /usr/local/share/docker-init.sh
 set -e
 
 DOCKER_SOCKET=/var/run/docker.sock
-DOCKER_SOCKET_USER="@USERNAME@"
+DOCKER_SOCKET_USER=@USERNAME@
 
 elevate() {
     if [ "${NEED_SUDO:-}" = 1 ]; then
