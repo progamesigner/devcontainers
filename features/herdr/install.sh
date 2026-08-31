@@ -5,6 +5,7 @@ HERDR_BRIDGE=${BRIDGE:-${2:-true}}
 HERDR_REMOTE_USER=${REMOTEUSER:-${3:-}}
 HERDR_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
 HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${5:-/run/secrets/herdr_bridge_key}}
+HERDR_SESSIONS=${SESSIONS:-${6:-}}
 
 set -e
 
@@ -57,19 +58,30 @@ cat << 'EOF' > /usr/local/share/herdr-init.sh
 EOF
 chmod +x /usr/local/share/herdr-init.sh
 
-# Bridge the host's HERDR_SOCKET_PATH Unix socket into the container over SSH.
+# Bridge the host's herdr Unix socket(s) into the container over SSH.
 #
 # On Docker Desktop/OrbStack-style setups the container runs in a separate
 # VM/kernel from the host, so a bind-mounted copy of the host's herdr.sock
 # is just a stale file — connecting to it returns ECONNREFUSED, since a Unix
 # domain socket is a live kernel object, not just file bytes. OpenSSH's
 # `-L localsocket:remotesocket` forwards an actual Unix-socket-to-Unix-socket
-# tunnel over the ssh connection, which does cross the boundary. This needs
-# Remote Login (sshd) enabled on the macOS host, plus a dedicated,
-# forwarding-only key — see
+# tunnel over the ssh connection, which does cross the boundary. `~` in the
+# remote path is resolved server-side (sshd expands it against the
+# authenticated user's home directory) — confirmed live: a garbage remote
+# path is rejected by the local ssh client before it even connects, but
+# `~/.config/herdr/herdr.sock` is accepted and passed through to the server.
+# This needs Remote Login (sshd) enabled on the macOS host, plus a
+# dedicated, forwarding-only key — see
 # https://gist.github.com/progamesigner/0f90551cabaaf54ccc8407fe9944c9c9
 # for how to generate and restrict it, and how to bind-mount the private key
 # into the container at privateKeyPath.
+#
+# `sessions` is a comma-separated list of herdr named-session names
+# (`herdr --session <name>`), each bridged as its own -L on the same ssh
+# connection: local /tmp/herdr-bridge-<name>.sock -> remote
+# ~/.config/herdr/sessions/<name>/herdr.sock. The default/unnamed session
+# (~/.config/herdr/herdr.sock) is always bridged to /tmp/herdr-bridge.sock,
+# regardless of `sessions`.
 if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
     echo "Setup Herdr socket bridge ..."
 
@@ -85,8 +97,8 @@ if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
 HERDR_REMOTE_USER="@HERDR_REMOTE_USER@"
 HERDR_REMOTE_HOST="@HERDR_REMOTE_HOST@"
 HERDR_PRIVATE_KEY_SRC="@HERDR_PRIVATE_KEY_PATH@"
+HERDR_SESSIONS="@HERDR_SESSIONS@"
 HERDR_PRIVATE_KEY="/tmp/herdr-bridge-key"
-HERDR_BRIDGE_SOCKET="/tmp/herdr-bridge.sock"
 HERDR_BRIDGE_KNOWN_HOSTS="/tmp/herdr-bridge-known-hosts"
 HERDR_BRIDGE_LOG="/tmp/herdr-bridge.log"
 
@@ -97,7 +109,25 @@ HERDR_BRIDGE_LOG="/tmp/herdr-bridge.log"
 if command -v ssh > /dev/null 2>&1 && [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
     cp "${HERDR_PRIVATE_KEY_SRC}" "${HERDR_PRIVATE_KEY}"
     chmod 600 "${HERDR_PRIVATE_KEY}"
-    rm -f "${HERDR_BRIDGE_SOCKET}"
+
+    rm -f /tmp/herdr-bridge.sock
+    set -- -L /tmp/herdr-bridge.sock:~/.config/herdr/herdr.sock
+
+    OLD_IFS="${IFS}"
+    IFS=","
+    for raw_name in ${HERDR_SESSIONS}; do
+        IFS="${OLD_IFS}"
+        # trim leading/trailing whitespace, so "work, personal" (space after
+        # the comma) doesn't end up as a literal " personal" socket path
+        name="${raw_name#"${raw_name%%[![:space:]]*}"}"
+        name="${name%"${name##*[![:space:]]}"}"
+        [ -n "${name}" ] || continue
+        rm -f "/tmp/herdr-bridge-${name}.sock"
+        set -- "$@" -L "/tmp/herdr-bridge-${name}.sock:~/.config/herdr/sessions/${name}/herdr.sock"
+        IFS=","
+    done
+    IFS="${OLD_IFS}"
+
     (
         while true; do
             ssh -N \
@@ -108,7 +138,7 @@ if command -v ssh > /dev/null 2>&1 && [ -f "${HERDR_PRIVATE_KEY_SRC}" ]; then
                 -o UserKnownHostsFile="${HERDR_BRIDGE_KNOWN_HOSTS}" \
                 -o StreamLocalBindUnlink=yes \
                 -i "${HERDR_PRIVATE_KEY}" \
-                -L "${HERDR_BRIDGE_SOCKET}:/Users/${HERDR_REMOTE_USER}/.config/herdr/herdr.sock" \
+                "$@" \
                 "${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST}" \
                 >> "${HERDR_BRIDGE_LOG}" 2>&1
             sleep 1
@@ -121,6 +151,7 @@ EOF
         -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
         -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
         -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
+        -e "s|@HERDR_SESSIONS@|${HERDR_SESSIONS}|g" \
         /usr/local/share/herdr-init.sh
     chmod +x /usr/local/share/herdr-init.sh
 

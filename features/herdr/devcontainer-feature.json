@@ -32,6 +32,11 @@
             "type": "string",
             "default": "/run/secrets/herdr_bridge_key",
             "description": "Path inside the container where the dedicated bridge SSH private key is bind-mounted (see the feature README for how to generate and restrict it)"
+        },
+        "sessions": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated herdr named-session names (from `herdr --session <name>`) to also bridge, each at /tmp/herdr-bridge-<name>.sock. The default/unnamed session is always bridged at /tmp/herdr-bridge.sock regardless of this option."
         }
     },
     "containerEnv": {
