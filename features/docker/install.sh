@@ -126,42 +126,50 @@ if [[ ${DOCKER_SOCKET_USER} = automatic ]]; then
     DOCKER_SOCKET_USER=${_REMOTE_USER:-${_CONTAINER_USER:-root}}
 fi
 
-echo "$(cat << 'EOF'
-#!/usr/bin/env bash
+cat << 'EOF' > /usr/local/share/docker-init.sh
+#!/bin/sh
 
 set -e
 
 DOCKER_SOCKET=/var/run/docker.sock
 DOCKER_SOCKET_USER="@USERNAME@"
 
-if [[ -S ${DOCKER_SOCKET} ]] && [[ ${DOCKER_SOCKET_USER} != root ]] && id "${DOCKER_SOCKET_USER}" > /dev/null 2>&1; then
-    ELEVATE=()
-    if [[ $(id -u) != 0 ]]; then
+elevate() {
+    if [ "${NEED_SUDO:-}" = 1 ]; then
+        sudo -n "$@"
+    else
+        "$@"
+    fi
+}
+
+if [ -S ${DOCKER_SOCKET} ] && [ ${DOCKER_SOCKET_USER} != root ] && id ${DOCKER_SOCKET_USER} > /dev/null 2>&1; then
+    NEED_SUDO=""
+    if [ $(id -u) != 0 ]; then
         if command -v sudo > /dev/null && sudo -n true 2> /dev/null; then
-            ELEVATE=(sudo -n)
+            NEED_SUDO="1"
         else
             echo "Unable to grant ${DOCKER_SOCKET_USER} access to ${DOCKER_SOCKET}: root or passwordless sudo is required." >&2
             exec "$@"
         fi
     fi
 
-    DOCKER_SOCKET_GID=$(stat -c '%g' "${DOCKER_SOCKET}")
-    DOCKER_GROUP=$(getent group "${DOCKER_SOCKET_GID}" | cut -d: -f1)
-
-    if [[ -z ${DOCKER_GROUP} ]]; then
+    DOCKER_SOCKET_GID=$(stat -c '%g' ${DOCKER_SOCKET})
+    DOCKER_GROUP=$(getent group ${DOCKER_SOCKET_GID} | cut -d: -f1)
+    if [ -z "${DOCKER_GROUP}" ]; then
         if getent group docker > /dev/null; then
-            "${ELEVATE[@]}" groupmod --gid "${DOCKER_SOCKET_GID}" docker
+            elevate groupmod --gid ${DOCKER_SOCKET_GID} docker
         else
-            "${ELEVATE[@]}" groupadd --gid "${DOCKER_SOCKET_GID}" docker
+            elevate groupadd --gid ${DOCKER_SOCKET_GID} docker
         fi
         DOCKER_GROUP=docker
     fi
 
-    if ! id -nG "${DOCKER_SOCKET_USER}" | tr ' ' '\n' | grep -qx "${DOCKER_GROUP}"; then
-        "${ELEVATE[@]}" usermod --append --groups "${DOCKER_GROUP}" "${DOCKER_SOCKET_USER}"
+    if ! id -nG ${DOCKER_SOCKET_USER} | tr ' ' '\n' | grep -qx ${DOCKER_GROUP}; then
+        elevate usermod --append --groups ${DOCKER_GROUP} ${DOCKER_SOCKET_USER}
     fi
 fi
 EOF
-)" > /usr/local/share/docker-init.sh
-sed -i "s|@USERNAME@|${DOCKER_SOCKET_USER}|" /usr/local/share/docker-init.sh
+sed -i \
+    -e "s|@USERNAME@|${DOCKER_SOCKET_USER}|" \
+    /usr/local/share/docker-init.sh
 chmod +x /usr/local/share/docker-init.sh

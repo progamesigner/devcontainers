@@ -1,6 +1,6 @@
 {
     "id": "devtools",
-    "version": "1.0.16",
+    "version": "1.0.17",
     "name": "DevTools",
     "description": "A set of development tools",
     "options": {

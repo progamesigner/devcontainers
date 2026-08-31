@@ -101,11 +101,13 @@ if [[ ${USERNAME} != root ]]; then
 fi
 
 # Add shim: code - it fallbacks to code-insiders if code is not available
-echo "$(cat << 'EOF'
+cat << 'EOF' > /usr/local/bin/code
 #!/bin/sh
 
+set -e
+
 get_in_path_except_current() {
-    which -a "$1" | grep -A1 "$0" | grep -v "$0"
+    which -a "$1" | grep -A1 "$0" | grep -v "$0" || true
 }
 
 code="$(get_in_path_except_current code)"
@@ -119,11 +121,10 @@ else
     exit 127
 fi
 EOF
-)" > /usr/local/bin/code
 chmod +x /usr/local/bin/code
 
 # Add shim: systemctl - tells people to use 'service' if systemd is not running
-echo "$(cat << 'EOF'
+cat << 'EOF' > /usr/local/bin/systemctl
 #!/bin/sh
 
 set -e
@@ -134,7 +135,6 @@ else
     echo '\n"systemd" is not running in this container due to its overhead.\nUse the "service" command to start services intead. e.g.: \n\nservice --status-all'
 fi
 EOF
-)" > /usr/local/bin/systemctl
 chmod +x /usr/local/bin/systemctl
 
 # Configure shell

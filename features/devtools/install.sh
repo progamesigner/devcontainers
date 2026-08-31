@@ -124,7 +124,7 @@ if [[ ${TAILSCALE_VERSION} != none ]]; then
     rm -rf /tmp/tailscale /tmp/tailscale.tar.gz
 fi
 
-echo "$(cat << 'EOF'
+cat << 'EOF' > /usr/local/share/devtools-init.sh
 #!/bin/sh
 
 set -e
@@ -169,7 +169,6 @@ if [ -f ${DEV_SETUP_PATH} ]; then
     execute rm -rf /var/lib/apt/lists/*
 fi
 EOF
-)" > /usr/local/share/devtools-init.sh
 chmod +x /usr/local/share/devtools-init.sh
 
 apt-get autoremove --yes
