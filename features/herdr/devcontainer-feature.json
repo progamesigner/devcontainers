@@ -1,6 +1,6 @@
 {
     "id": "herdr",
-    "version": "1.1.3",
+    "version": "1.2.0",
     "name": "Herdr",
     "description": "Install Herdr and bridge its pane socket(s) in from the Docker host over SSH",
     "options": {
@@ -28,10 +28,10 @@
             "default": "host.docker.internal",
             "description": "Hostname of the Docker host, reachable from inside the container"
         },
-        "remoteHome": {
+        "remoteSocketPath": {
             "type": "string",
             "default": "",
-            "description": "Home directory of the remote user on the Docker host"
+            "description": "Absolute path of the default session's herdr Unix socket on the Docker host. Leave empty to default to /Users/<remoteUser>/.config/herdr/herdr.sock. Named-session sockets (HERDR_SESSION) are derived from this path's directory as sessions/<name>/herdr.sock next to it — if you point this at a non-standard layout, named sessions won't resolve correctly."
         },
         "privateKeyPath": {
             "type": "string",

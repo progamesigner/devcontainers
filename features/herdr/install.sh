@@ -4,7 +4,7 @@ HERDR_VERSION=${VERSION:-${1:-latest}}
 HERDR_BRIDGE=${BRIDGE:-${2:-true}}
 HERDR_REMOTE_USER=${REMOTEUSER:-${3:-}}
 HERDR_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
-HERDR_REMOTE_HOME=${REMOTEHOME:-${5:-/Users/${HERDR_REMOTE_USER}}}
+HERDR_REMOTE_SOCKET_PATH=${REMOTESOCKETPATH:-${5:-/Users/${HERDR_REMOTE_USER}/.config/herdr/herdr.sock}}
 HERDR_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${6:-/var/run/secrets/herdr-devcontainer-bridge/key}}
 
 set -e
@@ -64,7 +64,7 @@ if [[ ${HERDR_BRIDGE} = true && -n ${HERDR_REMOTE_USER} ]]; then
 
 set -e
 
-/usr/local/share/herdr-bridge.sh ${_REMOTE_USER_HOME}/.config/herdr .config/herdr/herdr.sock
+/usr/local/share/herdr-bridge.sh ${_REMOTE_USER_HOME}/.config/herdr
 EOF
     chmod +x /usr/local/share/herdr-init.sh
 
@@ -76,10 +76,10 @@ set -e
 HERDR_SESSION=${HERDR_SESSION:-}
 if [ -n "${HERDR_SESSION}" ]; then
     HERDR_BRIDGE_DIR=${HOME}/.config/herdr/sessions/${HERDR_SESSION}
-    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} .config/herdr/sessions/${HERDR_SESSION}/herdr.sock
+    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} ${HERDR_SESSION}
 else
     HERDR_BRIDGE_DIR=${HOME}/.config/herdr
-    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR} .config/herdr/herdr.sock
+    /usr/local/share/herdr-bridge.sh ${HERDR_BRIDGE_DIR}
 fi
 
 export HERDR_ENV=1
@@ -100,12 +100,19 @@ EOF
 set -e
 
 HERDR_BRIDGE_DIR=$1
-HERDR_BRIDGE_REMOTE=$2
+HERDR_BRIDGE_SESSION=$2
+
+HERDR_REMOTE_SOCKET_PATH="@HERDR_REMOTE_SOCKET_PATH@"
 
 HERDR_PRIVATE_KEY_SRC=@HERDR_PRIVATE_KEY_PATH@
-HERDR_REMOTE_HOME=@HERDR_REMOTE_HOME@
 HERDR_REMOTE_HOST=@HERDR_REMOTE_HOST@
 HERDR_REMOTE_USER=@HERDR_REMOTE_USER@
+
+if [ -n "${HERDR_BRIDGE_SESSION}" ]; then
+    HERDR_REMOTE_TARGET=$(dirname ${HERDR_REMOTE_SOCKET_PATH})/sessions/${HERDR_BRIDGE_SESSION}/herdr.sock
+else
+    HERDR_REMOTE_TARGET=${HERDR_REMOTE_SOCKET_PATH}
+fi
 
 HERDR_BRIDGE_KEY=/var/run/herdr-bridge/key-$(id -u)
 HERDR_BRIDGE_KNOWN_HOSTS=/var/run/herdr-bridge/known-hosts-$(id -u)
@@ -138,7 +145,7 @@ chmod 777 ${HERDR_BRIDGE_DIR}
             -o UserKnownHostsFile=${HERDR_BRIDGE_KNOWN_HOSTS} \
             -o StreamLocalBindUnlink=yes \
             $@ \
-            -L ${HERDR_BRIDGE_SOCKET}:${HERDR_REMOTE_HOME}/${HERDR_BRIDGE_REMOTE} \
+            -L "${HERDR_BRIDGE_SOCKET}:${HERDR_REMOTE_TARGET}" \
             ${HERDR_REMOTE_USER}@${HERDR_REMOTE_HOST} \
             >> ${HERDR_BRIDGE_LOG} 2>&1 &
         SSH_PID=$!
@@ -154,7 +161,7 @@ EOF
     sed -i \
         -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \
         -e "s|@HERDR_REMOTE_HOST@|${HERDR_REMOTE_HOST}|g" \
-        -e "s|@HERDR_REMOTE_HOME@|${HERDR_REMOTE_HOME}|g" \
+        -e "s|@HERDR_REMOTE_SOCKET_PATH@|${HERDR_REMOTE_SOCKET_PATH}|g" \
         -e "s|@HERDR_PRIVATE_KEY_PATH@|${HERDR_PRIVATE_KEY_PATH}|g" \
         /usr/local/share/herdr-bridge.sh
     chmod +x /usr/local/share/herdr-bridge.sh
