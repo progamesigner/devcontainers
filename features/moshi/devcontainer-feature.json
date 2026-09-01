@@ -1,0 +1,43 @@
+{
+    "id": "moshi",
+    "version": "1.0.0",
+    "name": "Moshi",
+    "description": "Install moshi-hook and bridge its Unix socket in from the Docker host over SSH",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a moshi-hook version to install"
+        },
+        "bridge": {
+            "type": "boolean",
+            "default": true,
+            "description": "Bridge the host's moshi-hook Unix socket into the container over SSH, so agent hooks running inside the container can reach the moshi-hook daemon on the host. Needed on Docker Desktop / OrbStack-style setups, where the host's Unix socket file isn't reachable through a bind mount. Requires Remote Login (sshd) enabled on the host and remoteUser set. Independent of the herdr feature — works with or without it installed."
+        },
+        "remoteUser": {
+            "type": "string",
+            "default": "",
+            "description": "The username to SSH into for the socket bridge. Leave empty to disable the bridge even if `bridge` is true."
+        },
+        "remoteHost": {
+            "type": "string",
+            "default": "host.docker.internal",
+            "description": "Hostname of the Docker host, reachable from inside the container"
+        },
+        "remoteSocketPath": {
+            "type": "string",
+            "default": "",
+            "description": "Absolute path of the moshi-hook Unix socket on the Docker host. Leave empty to default to /Users/<remoteUser>/Library/Application Support/Moshi/moshi-hook.sock (macOS's moshi-hook default). moshi-hook's default location isn't under $HOME on Linux hosts — set this explicitly there, typically $XDG_RUNTIME_DIR/moshi-hook.sock or /tmp/moshi-hook.sock (check `moshi-hook status` on that host)."
+        },
+        "privateKeyPath": {
+            "type": "string",
+            "default": "/var/run/secrets/moshi-devcontainer-bridge/key",
+            "description": "Path inside the container where a dedicated bridge SSH private key would be bind-mounted, IF you use one. Optional: if no file exists at this path when the container starts, ssh runs without -i and falls back to whatever auth is otherwise available (e.g. an agent forwarded via SSH_AUTH_SOCK). Re-checked on every reconnect attempt, not just once at container start."
+        }
+    },
+    "entrypoint": "/usr/local/share/moshi-init.sh"
+}
