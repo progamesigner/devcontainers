@@ -1,12 +1,15 @@
 {
     "id": "claude-code",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "name": "Claude Code",
     "description": "Install Claude Code",
     "installsAfter": [
         "ghcr.io/devcontainers/features/node",
         "ghcr.io/progamesigner/devcontainers/features/node"
     ],
+    "containerEnv": {
+        "PATH": "${PATH}:/usr/local/share/claude-code/bin"
+    },
     "customizations": {
         "vscode": {
             "extensions": [

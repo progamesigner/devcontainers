@@ -17,7 +17,7 @@ if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
     exit 1
 fi
 
-npm install -g @anthropic-ai/claude-code
+npm install -g --prefix /usr/local/share/claude-code @anthropic-ai/claude-code
 
 CLAUDE_HOME="${_REMOTE_USER_HOME}"
 

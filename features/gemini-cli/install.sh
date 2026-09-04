@@ -17,6 +17,6 @@ if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
     exit 1
 fi
 
-npm install -g @google/gemini-cli
+npm install -g --prefix /usr/local/share/gemini-cli @google/gemini-cli
 
 echo "Done!"

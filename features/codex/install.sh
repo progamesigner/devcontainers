@@ -25,7 +25,7 @@ apt-get update
 apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
 apt-get upgrade --no-install-recommends --yes
 
-npm install -g @openai/codex
+npm install -g --prefix /usr/local/share/codex @openai/codex
 
 apt-get autoremove --yes
 apt-get clean --yes
