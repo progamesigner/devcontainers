@@ -17,6 +17,7 @@ fi
 BUILD_PACKAGES=" \
     dpkg-dev \
     gcc \
+    gnupg \
     gzip \
     libc-dev \
     libssl-dev \

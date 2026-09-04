@@ -30,6 +30,11 @@ BUILD_PACKAGES=" \
 if [[ ${FLUTTER_VERSION} != none ]]; then
     echo "Setup Flutter v${FLUTTER_VERSION} ..."
 
+    if [[ $(dpkg --print-architecture) != amd64 ]]; then
+        echo "Flutter for Linux is only published for amd64, but this is $(dpkg --print-architecture)."
+        exit 1
+    fi
+
     apt-get update
     apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends --yes

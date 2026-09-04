@@ -18,6 +18,7 @@ BUILD_PACKAGES=" \
     dpkg-dev \
     g++ \
     gcc \
+    gnupg \
     libc-dev \
     make \
     python3 \

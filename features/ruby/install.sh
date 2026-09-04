@@ -16,6 +16,7 @@ fi
 
 BUILD_PACKAGES=" \
     autoconf \
+    dpkg-dev \
     gcc \
     libffi-dev \
     libgmp-dev \
