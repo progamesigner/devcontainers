@@ -30,6 +30,7 @@ BUILD_PACKAGES=" \
     file \
     g++ \
     gcc \
+    gnupg \
     libargon2-dev \
     libc-dev \
     libcurl4-openssl-dev \
@@ -49,37 +50,6 @@ BUILD_PACKAGES=" \
     zlib1g-dev \
 "
 
-GPG_KEYS=""
-
-# PHP 8.1
-GPG_KEYS=" \
-    528995BFEDFBA7191D46839EF9BA0ADA31CBD89E \
-    39B641343D8C104B2B146DC3F9C39DC0B9698544 \
-    F1F692238FBC1666E5A5CCD4199F9DFEF6FFBAFD \
-    ${GPG_KEYS}
-"
-
-# PHP 8.0
-GPG_KEYS=" \
-    1729F83938DA44E27BA0F4D3DBDB397470D12172 \
-    BFDDD28642824F8118EF77909B67A5C12229118F \
-    ${GPG_KEYS}
-"
-
-# PHP 7.4
-GPG_KEYS=" \
-    5A52880781F755608BF815FC910DEB46F53EA312 \
-    42670A7FE4D0441C8E4632349E4FDC074A4EF02D \
-    ${GPG_KEYS}
-"
-
-# PHP 7.3
-GPG_KEYS=" \
-    CBAF69F173A0FEA4B537F470D66C9593118BCCB6 \
-    F38252826ACD957EF380D39F2F7956BC5DA04B5D \
-    ${GPG_KEYS}
-"
-
 if [[ ${PHP_VERSION} != none ]]; then
     echo "Build PHP v${PHP_VERSION} from source ..."
 
@@ -91,7 +61,7 @@ if [[ ${PHP_VERSION} != none ]]; then
     curl -sSL -o /tmp/php.tar.xz.asc https://www.php.net/distributions/php-${PHP_VERSION}.tar.xz.asc
 
     export GNUPGHOME=$(mktemp -d)
-    gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
+    curl -sSL https://www.php.net/distributions/php-keyring.gpg | gpg --import
     gpg --batch --verify /tmp/php.tar.xz.asc /tmp/php.tar.xz
     gpgconf --kill all
     rm -rf ${GNUPGHOME}

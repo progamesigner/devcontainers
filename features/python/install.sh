@@ -4,6 +4,10 @@ PYTHON_VERSION=${VERSION:-${1:-none}}
 
 PYTHON_OPTIMIZE=${OPTIMIZE:-false}
 
+COSIGN_VERSION=${COSIGN_VERSION:-3.1.3}
+SIGSTORE_IDENTITY_REGEXP='^([^@]+@python\.org|lukasz@langa\.pl)$'
+SIGSTORE_ISSUER_REGEXP='^https://(accounts\.google\.com|github\.com/login/oauth)$'
+
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
@@ -50,21 +54,25 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
     apt-get upgrade --no-install-recommends --yes
 
+    COSIGN_ARCHITECTURE=""
+    case "$(dpkg --print-architecture)" in
+        amd64) COSIGN_ARCHITECTURE=amd64;;
+        arm64) COSIGN_ARCHITECTURE=arm64;;
+        *) echo "unsupported architecture"; exit 1 ;;
+    esac
+
     curl -sSL -o /tmp/python.tar.xz https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz
-    curl -sSLf -o /tmp/python.tar.xz.asc https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.asc || true
     curl -sSLf -o /tmp/python.tar.xz.sigstore https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz.sigstore || true
 
-    if [ -n "$(command -v cosign)" ] && [ -f /tmp/python.tar.xz.sigstore ]; then
-        cosign verify-blob --bundle=/tmp/python.tar.xz.sigstore --certificate-identity-regexp='.*' --certificate-oidc-issuer-regexp='.*' /tmp/python.tar.xz
+    if [ ! -f /tmp/python.tar.xz.sigstore ]; then
+        echo "Python ${PYTHON_VERSION} publishes no Sigstore bundle. Bundles start at 3.9.16; older releases cannot be verified here."
+        exit 1
     fi
 
-    if [ -f /tmp/python.tar.xz.asc ]; then
-        export GNUPGHOME=$(mktemp -d)
-        gpg --batch --keyserver hkps://keyserver.ubuntu.com --recv-keys ${GPG_KEYS} || gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys ${GPG_KEYS} || true
-        gpg --batch --verify /tmp/python.tar.xz.asc /tmp/python.tar.xz
-        gpgconf --kill all
-        rm -rf ${GNUPGHOME}
-    fi
+    curl -sSLf -o /tmp/cosign https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-${COSIGN_ARCHITECTURE}
+    chmod +x /tmp/cosign
+    /tmp/cosign verify-blob --bundle=/tmp/python.tar.xz.sigstore --certificate-identity-regexp="${SIGSTORE_IDENTITY_REGEXP}" --certificate-oidc-issuer-regexp="${SIGSTORE_ISSUER_REGEXP}" /tmp/python.tar.xz
+    rm -rf /tmp/cosign
 
     mkdir -p /usr/src/python
     tar -xJ -f /tmp/python.tar.xz -C /usr/src/python --strip-components=1
@@ -89,7 +97,7 @@ if [[ ${PYTHON_VERSION} != none ]]; then
     make install
     cd -
 
-    rm -rf /tmp/python.tar.xz.asc /tmp/python.tar.xz.sigstore /tmp/python.tar.xz /usr/src/python
+    rm -rf /tmp/python.tar.xz.sigstore /tmp/python.tar.xz /usr/src/python
 
     ln -s /usr/local/bin/idle3 /usr/local/bin/idle
     ln -s /usr/local/bin/pip3 /usr/local/bin/pip
