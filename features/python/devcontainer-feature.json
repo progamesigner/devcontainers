@@ -1,6 +1,6 @@
 {
     "id": "python",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "name": "Python",
     "description": "Install Python",
     "options": {
@@ -17,6 +17,11 @@
             "default": false,
             "description": "Optimize Python for performance when compiled (slow)"
         }
+    },
+    "containerEnv": {
+        "UV_TOOL_DIR": "/usr/local/uv/tools",
+        "UV_TOOL_BIN_DIR": "/usr/local/uv/bin",
+        "PATH": "${PATH}:${UV_TOOL_BIN_DIR}"
     },
     "customizations": {
         "vscode": {
