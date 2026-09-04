@@ -2,7 +2,7 @@
 
 NODE_VERSION=${VERSION:-${1:-none}}
 
-NPM_HOME=${NPM_HOME:-/usr/local/npm}
+NPM_CONFIG_PREFIX=${NPM_CONFIG_PREFIX:-/usr/local/npm}
 
 set -e
 
@@ -85,10 +85,8 @@ if [[ ${NODE_VERSION} != none ]]; then
 
     rm -rf /tmp/SHASUMS256.txt /tmp/node.tar.xz.asc /tmp/node.tar.xz
 
-    mkdir -p ${NPM_HOME}
-    chmod a+rwx ${NPM_HOME}
-
-    echo "if [[ "\${PATH}" != *"\${NPM_HOME}/bin"* ]]; then export PATH="\${NPM_HOME}/bin:\${PATH}"; fi" >> /etc/bash.bashrc
+    mkdir -p ${NPM_CONFIG_PREFIX}
+    chmod a+rwx ${NPM_CONFIG_PREFIX}
 
     apt-get autoremove --yes
     apt-get clean --yes

@@ -1,6 +1,6 @@
 {
     "id": "node",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "name": "NodeJS",
     "description": "Install NodeJS",
     "options": {
@@ -14,8 +14,8 @@
         }
     },
     "containerEnv": {
-        "NPM_HOME": "/usr/local/npm",
-        "PATH": "${PATH}:${NPM_HOME}/bin"
+        "NPM_CONFIG_PREFIX": "/usr/local/npm",
+        "PATH": "${PATH}:${NPM_CONFIG_PREFIX}/bin"
     },
     "customizations": {
         "vscode": {
