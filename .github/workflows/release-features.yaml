@@ -3,7 +3,7 @@ name: Release devcontainer features
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - features/**
 

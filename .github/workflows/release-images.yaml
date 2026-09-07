@@ -3,7 +3,7 @@ name: Release devcontainer images
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - images/**
 
