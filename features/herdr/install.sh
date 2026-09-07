@@ -126,10 +126,11 @@ HERDR_BRIDGE_SOCKET=${HERDR_BRIDGE_DIR}/herdr.sock
 
 command -v ssh > /dev/null 2>&1 || exit 0
 
-if [ -f ${HERDR_BRIDGE_PID} ] && kill -0 "$(cat ${HERDR_BRIDGE_PID})" 2>/dev/null; then
+HERDR_BRIDGE_LAST_PID=$(cat ${HERDR_BRIDGE_PID} 2>/dev/null || true)
+if [ -n "${HERDR_BRIDGE_LAST_PID}" ] && kill -0 "${HERDR_BRIDGE_LAST_PID}" 2>/dev/null && grep -qsa herdr-bridge.sh /proc/"${HERDR_BRIDGE_LAST_PID}"/cmdline; then
     exit 0
 fi
-rm -f ${HERDR_BRIDGE_SOCKET}
+rm -f ${HERDR_BRIDGE_PID} ${HERDR_BRIDGE_SOCKET}
 
 mkdir -p ${HERDR_BRIDGE_DIR}
 chmod 777 ${HERDR_BRIDGE_DIR}

@@ -111,10 +111,14 @@ MOSHI_BRIDGE_PID=/var/run/moshi-bridge/bridge-$(id -u).pid
 MOSHI_BRIDGE_SOCKET=${MOSHI_BRIDGE_DIR}/moshi-hook.sock
 
 command -v ssh > /dev/null 2>&1 || exit 0
-if [ -f ${MOSHI_BRIDGE_PID} ] && kill -0 "$(cat ${MOSHI_BRIDGE_PID})" 2>/dev/null; then
+
+MOSHI_BRIDGE_LAST_PID=$(cat ${MOSHI_BRIDGE_PID} 2>/dev/null || true)
+if [ -n "${MOSHI_BRIDGE_LAST_PID}" ] && \
+   kill -0 "${MOSHI_BRIDGE_LAST_PID}" 2>/dev/null && \
+   grep -qsa moshi-bridge.sh /proc/"${MOSHI_BRIDGE_LAST_PID}"/cmdline; then
     exit 0
 fi
-rm -f ${MOSHI_BRIDGE_SOCKET}
+rm -f ${MOSHI_BRIDGE_PID} ${MOSHI_BRIDGE_SOCKET}
 
 mkdir -p ${MOSHI_BRIDGE_DIR}
 chmod 777 ${MOSHI_BRIDGE_DIR}
