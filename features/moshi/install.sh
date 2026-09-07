@@ -93,6 +93,10 @@ EOF
 
 set -e
 
+if [ -z "${MOSHI_BRIDGE_SETSID:-}" ] && command -v setsid > /dev/null 2>&1; then
+    MOSHI_BRIDGE_SETSID=1 exec setsid "$0" "$@"
+fi
+
 MOSHI_BRIDGE_DIR=$1
 
 MOSHI_PRIVATE_KEY_SRC=@MOSHI_PRIVATE_KEY_PATH@

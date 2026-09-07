@@ -1,6 +1,6 @@
 {
     "id": "herdr",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "name": "Herdr",
     "description": "Install Herdr and bridge its pane socket(s) in from the Docker host over SSH",
     "options": {

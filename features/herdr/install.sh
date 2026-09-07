@@ -99,6 +99,10 @@ EOF
 
 set -e
 
+if [ -z "${HERDR_BRIDGE_SETSID:-}" ] && command -v setsid > /dev/null 2>&1; then
+    HERDR_BRIDGE_SETSID=1 exec setsid "$0" "$@"
+fi
+
 HERDR_BRIDGE_DIR=$1
 HERDR_BRIDGE_SESSION=$2
 
