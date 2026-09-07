@@ -37,6 +37,16 @@
             "type": "string",
             "default": "/var/run/secrets/moshi-devcontainer-bridge/key",
             "description": "Path inside the container where a dedicated bridge SSH private key would be bind-mounted, IF you use one. Optional: if no file exists at this path when the container starts, ssh runs without -i and falls back to whatever auth is otherwise available (e.g. an agent forwarded via SSH_AUTH_SOCK). Re-checked on every reconnect attempt, not just once at container start."
+        },
+        "clipboard": {
+            "type": "boolean",
+            "default": false,
+            "description": "Serve Moshi's pasted images to agents that read the OS clipboard. Codex uses arboard, which talks to X11: with no live display it fails with an X11 connection timeout. Enabling this installs xvfb/xclip/imagemagick/inotify-tools, runs a 1x1 Xvfb, and loads every new moshi-paste-* file from `clipboardWatchPath` into the X clipboard as PNG. Claude Code does not need it (it accepts the pasted path), but the clipboard route is agent-agnostic. DISPLAY is exported only for commands launched through moshi-devcontainer; login shells are not modified. The clipboard and socket bridge can be enabled independently."
+        },
+        "clipboardWatchPath": {
+            "type": "string",
+            "default": "",
+            "description": "Absolute path, inside the container, of the directory moshi-hook's daemon writes pasted images into -- its TMPDIR, shared into the container at the SAME absolute path. Leave empty to still start the display but watch nothing, e.g. when the image drives the clipboard itself."
         }
     },
     "entrypoint": "/usr/local/share/moshi-init.sh"

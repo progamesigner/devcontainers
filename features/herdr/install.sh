@@ -90,7 +90,7 @@ for _ in 1 2 3 4 5; do
     sleep 0.2
 done
 
-exec $@
+exec "$@"
 EOF
     chmod +x /usr/local/bin/herdr-devcontainer
 

@@ -6,6 +6,9 @@ MOSHI_REMOTE_USER=${REMOTEUSER:-${3:-}}
 MOSHI_REMOTE_HOST=${REMOTEHOST:-${4:-host.docker.internal}}
 MOSHI_REMOTE_SOCKET_PATH=${REMOTESOCKETPATH:-${5:-/Users/${MOSHI_REMOTE_USER}/Library/Application Support/Moshi/moshi-hook.sock}}
 MOSHI_PRIVATE_KEY_PATH=${PRIVATEKEYPATH:-${6:-/var/run/secrets/moshi-devcontainer-bridge/key}}
+MOSHI_CLIPBOARD=${CLIPBOARD:-${7:-false}}
+MOSHI_CLIPBOARD_WATCH_PATH=${CLIPBOARDWATCHPATH:-${8:-}}
+MOSHI_CLIPBOARD_DISPLAY=:99
 
 set -e
 
@@ -53,40 +56,47 @@ cat << 'EOF' > /usr/local/share/moshi-init.sh
 #!/bin/sh
 
 set -e
+
+MOSHI_BRIDGE_DIR=${MOSHI_BRIDGE_DIR:-@MOSHI_USER_HOME@/.local/share/moshi}
+
+if [ -x /usr/local/share/moshi-bridge.sh ]; then
+    /usr/local/share/moshi-bridge.sh "${MOSHI_BRIDGE_DIR}"
+    export MOSHI_SOCKET_PATH="${MOSHI_BRIDGE_DIR}/moshi-hook.sock"
+fi
+
+if [ -x /usr/local/share/moshi-clipboard.sh ]; then
+    /usr/local/share/moshi-clipboard.sh
+    export DISPLAY=${DISPLAY:-@MOSHI_CLIPBOARD_DISPLAY@}
+fi
 EOF
+sed -i \
+    -e "s|@MOSHI_USER_HOME@|${_REMOTE_USER_HOME:-/root}|g" \
+    -e "s|@MOSHI_CLIPBOARD_DISPLAY@|${MOSHI_CLIPBOARD_DISPLAY}|g" \
+    /usr/local/share/moshi-init.sh
 chmod +x /usr/local/share/moshi-init.sh
 
-if [[ ${MOSHI_BRIDGE} = true && -n ${MOSHI_REMOTE_USER} ]]; then
-    mkdir -p /var/{log,run}/moshi-bridge
-    chmod 1777 /var/{log,run}/moshi-bridge
-
-    cat << EOF > /usr/local/share/moshi-init.sh
-#!/bin/sh
-
-set -e
-
-/usr/local/share/moshi-bridge.sh ${_REMOTE_USER_HOME}/.local/share/moshi
-EOF
-    chmod +x /usr/local/share/moshi-init.sh
-
-    cat << 'EOF' > /usr/local/bin/moshi-devcontainer
+cat << 'EOF' > /usr/local/bin/moshi-devcontainer
 #!/bin/sh
 
 set -e
 
 MOSHI_BRIDGE_DIR=${HOME}/.local/share/moshi
-/usr/local/share/moshi-bridge.sh ${MOSHI_BRIDGE_DIR}
+. /usr/local/share/moshi-init.sh
 
-export MOSHI_SOCKET_PATH=${MOSHI_BRIDGE_DIR}/moshi-hook.sock
+if [ -x /usr/local/share/moshi-bridge.sh ]; then
+    for _ in 1 2 3 4 5; do
+        [ -S "${MOSHI_SOCKET_PATH}" ] && break
+        sleep 0.2
+    done
+fi
 
-for _ in 1 2 3 4 5; do
-    [ -S ${MOSHI_BRIDGE_DIR}/moshi-hook.sock ] && break
-    sleep 0.2
-done
-
-exec $@
+exec "$@"
 EOF
-    chmod +x /usr/local/bin/moshi-devcontainer
+chmod +x /usr/local/bin/moshi-devcontainer
+
+if [[ ${MOSHI_BRIDGE} = true && -n ${MOSHI_REMOTE_USER} ]]; then
+    mkdir -p /var/{log,run}/moshi-bridge
+    chmod 1777 /var/{log,run}/moshi-bridge
 
     cat << 'EOF' > /usr/local/share/moshi-bridge.sh
 #!/bin/sh
@@ -164,4 +174,102 @@ EOF
         -e "s|@MOSHI_PRIVATE_KEY_PATH@|${MOSHI_PRIVATE_KEY_PATH}|g" \
         /usr/local/share/moshi-bridge.sh
     chmod +x /usr/local/share/moshi-bridge.sh
+fi
+
+if [[ ${MOSHI_CLIPBOARD} = true ]]; then
+    echo "Setup Moshi clipboard ..."
+
+    apt-get update -y
+    apt-get install -y --no-install-recommends \
+        imagemagick \
+        inotify-tools \
+        xclip \
+        xvfb
+    rm -rf /var/lib/apt/lists/*
+
+    mkdir -p /var/{log,run}/moshi-clipboard
+    chmod 1777 /var/{log,run}/moshi-clipboard
+
+    cat << 'EOF' > /usr/local/share/moshi-clipboard.sh
+#!/bin/sh
+
+set -e
+
+# Same reasoning as moshi-bridge.sh: detach before starting anything, so the
+# watcher below is not killed with the process group that launched it.
+if [ -z "${MOSHI_CLIPBOARD_SETSID:-}" ] && command -v setsid > /dev/null 2>&1; then
+    MOSHI_CLIPBOARD_SETSID=1 exec setsid "$0" "$@"
+fi
+
+MOSHI_CLIPBOARD_DISPLAY=@MOSHI_CLIPBOARD_DISPLAY@
+MOSHI_CLIPBOARD_WATCH_PATH="@MOSHI_CLIPBOARD_WATCH_PATH@"
+
+MOSHI_CLIPBOARD_LOG=/var/log/moshi-clipboard/$(id -u).log
+MOSHI_CLIPBOARD_OWNER=/var/run/moshi-clipboard/owner-$(id -u).pid
+MOSHI_CLIPBOARD_LOCK=/var/run/moshi-clipboard/lock-$(id -u)
+
+command -v Xvfb > /dev/null 2>&1 || exit 0
+command -v xclip > /dev/null 2>&1 || exit 0
+
+# One display per user, even if several agents start at once.
+mkdir ${MOSHI_CLIPBOARD_LOCK} 2>/dev/null || exit 0
+
+convert_to_png() {
+    # arboard asks X11 for image/png, and xclip stores bytes verbatim without
+    # converting, so anything that is not already PNG has to be converted here.
+    if command -v magick > /dev/null 2>&1; then
+        magick "$1" png:-
+    else
+        convert "$1" png:-
+    fi
+}
+
+serve_clipboard() {
+    # X11 selections are served by a live process: when the owner exits the
+    # clipboard goes empty. Replace the previous owner explicitly instead of
+    # pkill, which would also match this script's own command line.
+    if [ -f ${MOSHI_CLIPBOARD_OWNER} ]; then
+        kill "$(cat ${MOSHI_CLIPBOARD_OWNER})" 2>/dev/null || true
+        rm -f ${MOSHI_CLIPBOARD_OWNER}
+    fi
+    convert_to_png "$1" | xclip -display ${MOSHI_CLIPBOARD_DISPLAY} -selection clipboard -t image/png -i &
+    echo $! > ${MOSHI_CLIPBOARD_OWNER}
+}
+
+(
+    set +e
+
+    while true; do
+        Xvfb ${MOSHI_CLIPBOARD_DISPLAY} -screen 0 1x1x24 >> ${MOSHI_CLIPBOARD_LOG} 2>&1 &
+        XVFB_PID=$!
+
+        sleep 1
+
+        if [ -n "${MOSHI_CLIPBOARD_WATCH_PATH}" ] && [ -d "${MOSHI_CLIPBOARD_WATCH_PATH}" ]; then
+            inotifywait -q -m -e close_write -e moved_to --format '%f' "${MOSHI_CLIPBOARD_WATCH_PATH}" 2>>${MOSHI_CLIPBOARD_LOG} |
+            while read -r name; do
+                case "${name}" in
+                    moshi-paste-*) serve_clipboard "${MOSHI_CLIPBOARD_WATCH_PATH}/${name}" ;;
+                esac
+            done
+        fi
+
+        wait ${XVFB_PID} 2>/dev/null
+        sleep 1
+    done
+) &
+EOF
+    sed -i \
+        -e "s|@MOSHI_CLIPBOARD_DISPLAY@|${MOSHI_CLIPBOARD_DISPLAY}|g" \
+        -e "s|@MOSHI_CLIPBOARD_WATCH_PATH@|${MOSHI_CLIPBOARD_WATCH_PATH}|g" \
+        /usr/local/share/moshi-clipboard.sh
+    chmod +x /usr/local/share/moshi-clipboard.sh
+
+    if [[ -f /usr/local/bin/moshi-devcontainer ]]; then
+        sed -i \
+            -e "s|^export MOSHI_SOCKET_PATH=.*|&\\nexport DISPLAY=\${DISPLAY:-${MOSHI_CLIPBOARD_DISPLAY}}|" \
+            /usr/local/bin/moshi-devcontainer
+    fi
+
+    echo "Done!"
 fi
