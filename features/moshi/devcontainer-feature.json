@@ -1,6 +1,6 @@
 {
     "id": "moshi",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "Moshi",
     "description": "Install moshi-hook and bridge its Unix socket in from the Docker host over SSH",
     "options": {

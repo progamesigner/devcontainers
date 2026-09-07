@@ -121,10 +121,15 @@ fi
 HERDR_BRIDGE_KEY=/var/run/herdr-bridge/key-$(id -u)
 HERDR_BRIDGE_KNOWN_HOSTS=/var/run/herdr-bridge/known-hosts-$(id -u)
 HERDR_BRIDGE_LOG=/var/log/herdr-bridge/$(id -u).log
+HERDR_BRIDGE_PID=/var/run/herdr-bridge/bridge-$(id -u).pid
 HERDR_BRIDGE_SOCKET=${HERDR_BRIDGE_DIR}/herdr.sock
 
 command -v ssh > /dev/null 2>&1 || exit 0
-[ -S ${HERDR_BRIDGE_SOCKET} ] && exit 0
+
+if [ -f ${HERDR_BRIDGE_PID} ] && kill -0 "$(cat ${HERDR_BRIDGE_PID})" 2>/dev/null; then
+    exit 0
+fi
+rm -f ${HERDR_BRIDGE_SOCKET}
 
 mkdir -p ${HERDR_BRIDGE_DIR}
 chmod 777 ${HERDR_BRIDGE_DIR}
@@ -161,6 +166,7 @@ chmod 777 ${HERDR_BRIDGE_DIR}
         sleep 1
     done
 ) &
+echo $! > ${HERDR_BRIDGE_PID}
 EOF
     sed -i \
         -e "s|@HERDR_REMOTE_USER@|${HERDR_REMOTE_USER}|g" \

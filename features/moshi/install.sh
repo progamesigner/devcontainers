@@ -107,10 +107,14 @@ MOSHI_REMOTE_USER=@MOSHI_REMOTE_USER@
 MOSHI_BRIDGE_KEY=/var/run/moshi-bridge/key-$(id -u)
 MOSHI_BRIDGE_KNOWN_HOSTS=/var/run/moshi-bridge/known-hosts-$(id -u)
 MOSHI_BRIDGE_LOG=/var/log/moshi-bridge/$(id -u).log
+MOSHI_BRIDGE_PID=/var/run/moshi-bridge/bridge-$(id -u).pid
 MOSHI_BRIDGE_SOCKET=${MOSHI_BRIDGE_DIR}/moshi-hook.sock
 
 command -v ssh > /dev/null 2>&1 || exit 0
-[ -S ${MOSHI_BRIDGE_SOCKET} ] && exit 0
+if [ -f ${MOSHI_BRIDGE_PID} ] && kill -0 "$(cat ${MOSHI_BRIDGE_PID})" 2>/dev/null; then
+    exit 0
+fi
+rm -f ${MOSHI_BRIDGE_SOCKET}
 
 mkdir -p ${MOSHI_BRIDGE_DIR}
 chmod 777 ${MOSHI_BRIDGE_DIR}
@@ -147,6 +151,7 @@ chmod 777 ${MOSHI_BRIDGE_DIR}
         sleep 1
     done
 ) &
+echo $! > ${MOSHI_BRIDGE_PID}
 EOF
     sed -i \
         -e "s|@MOSHI_REMOTE_USER@|${MOSHI_REMOTE_USER}|g" \
