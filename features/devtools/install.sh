@@ -34,6 +34,7 @@ PACKAGE_LIST=" \
     iputils-clockdiff \
     iputils-ping \
     iputils-tracepath \
+    jq \
     lsof \
     ltrace \
     lynx \
@@ -77,11 +78,8 @@ if [[ ${COSIGN_VERSION} != none ]]; then
 
     ARCHITECTURE=""
     case "$(dpkg --print-architecture)" in
-        i386) ARCHITECTURE=386;;
         amd64) ARCHITECTURE=amd64;;
         arm64) ARCHITECTURE=arm64;;
-        armel) ARCHITECTURE=armv6;;
-        armhf) ARCHITECTURE=armv7;;
         *) echo "unsupported architecture"; exit 1 ;;
     esac
 
