@@ -3,6 +3,17 @@
     "version": "1.0.2",
     "name": "Codex",
     "description": "Install Codex",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a Codex version to install"
+        }
+    },
     "installsAfter": [
         "ghcr.io/devcontainers/features/node",
         "ghcr.io/progamesigner/devcontainers/features/node"

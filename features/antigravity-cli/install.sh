@@ -43,8 +43,9 @@ if [[ ${ANTIGRAVITY_CLI_VERSION} != none ]]; then
     fi
 
     REQUESTED_VERSION=${ANTIGRAVITY_CLI_VERSION#v}
-    if [[ ${ANTIGRAVITY_CLI_VERSION} != latest && ${REQUESTED_VERSION} != "${LATEST_VERSION}" ]]; then
-        echo "Antigravity CLI ${ANTIGRAVITY_CLI_VERSION} is unavailable from the official manifest; installing latest (${LATEST_VERSION})."
+    if [[ ${ANTIGRAVITY_CLI_VERSION} != latest && ${REQUESTED_VERSION} != "${LATEST_VERSION#v}" ]]; then
+        echo "Requested Antigravity CLI ${ANTIGRAVITY_CLI_VERSION}, but the official manifest provides ${LATEST_VERSION}. Refusing to install a different version." >&2
+        exit 1
     fi
 
     curl -fsSL -o /tmp/antigravity-cli.tar.gz ${DOWNLOAD_URL}

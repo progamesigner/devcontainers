@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CLAUDE_CODE_VERSION=${VERSION:-${1:-latest}}
+
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
@@ -10,14 +12,21 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
-echo "Setup Claude Code ..."
+if [[ ${CLAUDE_CODE_VERSION} = none ]]; then
+    mkdir -p /usr/local/share
+    printf '#!/bin/sh\nexit 0\n' > /usr/local/share/claude-code-init.sh
+    chmod +x /usr/local/share/claude-code-init.sh
+    exit 0
+fi
+
+echo "Setup Claude Code v${CLAUDE_CODE_VERSION} ..."
 
 if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
     echo "NodeJS or npm not found, please install Node.js before proceeding."
     exit 1
 fi
 
-npm install -g --prefix /usr/local/share/claude-code @anthropic-ai/claude-code
+npm install -g --prefix /usr/local/share/claude-code @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION#v}
 
 CLAUDE_HOME="${_REMOTE_USER_HOME}"
 

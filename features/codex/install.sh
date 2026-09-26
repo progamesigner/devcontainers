@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CODEX_VERSION=${VERSION:-${1:-latest}}
+
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
@@ -10,11 +12,15 @@ if [[ $(id -u) != 0 ]]; then
     exit 1
 fi
 
+if [[ ${CODEX_VERSION} = none ]]; then
+    exit 0
+fi
+
 BUILD_PACKAGES=" \
     bubblewrap \
 "
 
-echo "Setup Codex ..."
+echo "Setup Codex v${CODEX_VERSION} ..."
 
 if [ -z "$(command -v node)" ] || [ -z "$(command -v npm)" ]; then
     echo "NodeJS or npm not found, please install Node.js before proceeding."
@@ -25,7 +31,7 @@ apt-get update
 apt-get install --no-install-recommends --yes ${BUILD_PACKAGES}
 apt-get upgrade --no-install-recommends --yes
 
-npm install -g --prefix /usr/local/share/codex @openai/codex
+npm install -g --prefix /usr/local/share/codex @openai/codex@${CODEX_VERSION#v}
 
 apt-get autoremove --yes
 apt-get clean --yes

@@ -1,8 +1,19 @@
 {
     "id": "claude-code",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "name": "Claude Code",
     "description": "Install Claude Code",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a Claude Code version to install"
+        }
+    },
     "installsAfter": [
         "ghcr.io/devcontainers/features/node",
         "ghcr.io/progamesigner/devcontainers/features/node"
