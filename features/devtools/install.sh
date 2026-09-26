@@ -86,14 +86,14 @@ if [[ ${COSIGN_VERSION} != none ]]; then
     esac
 
     if [[ ${COSIGN_VERSION} = latest ]]; then
-        COSIGN_VERSION=$(curl -sSL https://api.github.com/repos/sigstore/cosign/releases/latest | jq -r ".tag_name")
+        COSIGN_VERSION=$(curl -fsSL https://api.github.com/repos/sigstore/cosign/releases/latest | jq -er ".tag_name")
     fi
 
     if [[ ${COSIGN_VERSION} != v* ]]; then
         COSIGN_VERSION=v${COSIGN_VERSION}
     fi
 
-    curl -sSL -o /tmp/cosign.deb https://github.com/sigstore/cosign/releases/latest/download/cosign_${COSIGN_VERSION#v}_${ARCHITECTURE}.deb
+    curl -fsSL -o /tmp/cosign.deb https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION#v}/cosign_${COSIGN_VERSION#v}_${ARCHITECTURE}.deb
     dpkg --install /tmp/cosign.deb
 
     rm -rf /tmp/cosign.deb
