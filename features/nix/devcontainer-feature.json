@@ -1,0 +1,62 @@
+{
+    "id": "nix",
+    "version": "1.0.0",
+    "name": "Nix",
+    "description": "Install Nix and prepare the development environment declared in a dev.nix file when the container is created or started",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest",
+                "none"
+            ],
+            "default": "latest",
+            "description": "Select or enter a Nix version to install"
+        },
+        "file": {
+            "type": "string",
+            "default": ".devcontainer/dev.nix",
+            "description": "Path of the dev.nix file, relative to the workspace folder. Nothing is prepared when the file does not exist."
+        },
+        "channel": {
+            "type": "string",
+            "proposals": [
+                "stable-26.05",
+                "unstable"
+            ],
+            "default": "stable-26.05",
+            "description": "Default nixpkgs channel when dev.nix does not set `channel`. Accepts stable-<release>, unstable, a nixpkgs branch name or a nixpkgs commit."
+        },
+        "allowUnfree": {
+            "type": "boolean",
+            "default": false,
+            "description": "Allow packages with an unfree license"
+        },
+        "autoRebuild": {
+            "type": "boolean",
+            "default": true,
+            "description": "Rebuild the environment on container start when dev.nix has changed since the last build"
+        }
+    },
+    "containerEnv": {
+        "NIX_SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+        "PATH": "/nix/var/devnix/profile/bin:/nix/var/nix/profiles/default/bin:${PATH}"
+    },
+    "mounts": [
+        {
+            "source": "nix-${devcontainerId}",
+            "target": "/nix",
+            "type": "volume"
+        }
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "jnoortheen.nix-ide"
+            ]
+        }
+    },
+    "onCreateCommand": "/usr/local/bin/devnix build",
+    "postCreateCommand": "/usr/local/bin/devnix run onCreate",
+    "postStartCommand": "/usr/local/bin/devnix start"
+}
