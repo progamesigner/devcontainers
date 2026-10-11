@@ -2,7 +2,7 @@
     "id": "nix",
     "version": "1.0.0",
     "name": "Nix",
-    "description": "Install Nix and prepare the development environment declared in a dev.nix file when the container is created or started",
+    "description": "Install Nix and prepare the development environment declared in a dev.nix file or a flake devShell when the container is created or started",
     "options": {
         "version": {
             "type": "string",
@@ -16,7 +16,17 @@
         "file": {
             "type": "string",
             "default": ".devcontainer/dev.nix",
-            "description": "Path of the dev.nix file, relative to the workspace folder. Nothing is prepared when the file does not exist."
+            "description": "Path of the environment file, relative to the workspace folder. Use a dev.nix file, or a flake.nix file to load one of its devShells. Nothing is prepared when the file does not exist.",
+            "proposals": [
+                ".devcontainer/dev.nix",
+                ".idx/dev.nix",
+                "flake.nix"
+            ]
+        },
+        "devShell": {
+            "type": "string",
+            "default": "default",
+            "description": "Name of the devShell to load when the file is a flake.nix"
         },
         "channel": {
             "type": "string",
@@ -25,17 +35,17 @@
                 "unstable"
             ],
             "default": "stable-26.05",
-            "description": "Default nixpkgs channel when dev.nix does not set `channel`. Accepts stable-<release>, unstable, a nixpkgs branch name or a nixpkgs commit."
+            "description": "Default nixpkgs channel when dev.nix does not set `channel`. Accepts stable-<release>, unstable, a nixpkgs branch name or a nixpkgs commit. Not used for flake.nix."
         },
         "allowUnfree": {
             "type": "boolean",
             "default": false,
-            "description": "Allow packages with an unfree license"
+            "description": "Allow packages with an unfree license. Not used for flake.nix."
         },
         "autoRebuild": {
             "type": "boolean",
             "default": true,
-            "description": "Rebuild the environment on container start when dev.nix has changed since the last build"
+            "description": "Rebuild the environment on container start when the environment file, its flake.lock or the options changed since the last build"
         }
     },
     "containerEnv": {

@@ -5,6 +5,7 @@ NIX_FILE=${FILE:-${2:-.devcontainer/dev.nix}}
 NIX_CHANNEL=${CHANNEL:-${3:-stable-26.05}}
 NIX_ALLOW_UNFREE=${ALLOWUNFREE:-${4:-false}}
 NIX_AUTO_REBUILD=${AUTOREBUILD:-${5:-true}}
+NIX_DEV_SHELL=${DEVSHELL:-${6:-default}}
 
 NIX_USER=${_REMOTE_USER:-root}
 
@@ -79,6 +80,7 @@ DEVNIX_FILE=\${DEVNIX_FILE:-${NIX_FILE}}
 DEVNIX_CHANNEL=\${DEVNIX_CHANNEL:-${NIX_CHANNEL}}
 DEVNIX_ALLOW_UNFREE=\${DEVNIX_ALLOW_UNFREE:-${NIX_ALLOW_UNFREE}}
 DEVNIX_AUTO_REBUILD=\${DEVNIX_AUTO_REBUILD:-${NIX_AUTO_REBUILD}}
+DEVNIX_DEV_SHELL=\${DEVNIX_DEV_SHELL:-${NIX_DEV_SHELL}}
 EOF
 
 cat << 'EOF' > /usr/local/share/devnix/eval.nix
@@ -141,6 +143,49 @@ pkgs.buildEnv {
 }
 EOF
 
+# Turn a flake devShell into plain exports that bash, zsh and sh can source,
+# like direnv does for `use flake`
+cat << 'EOF' > /usr/local/share/devnix/capture.sh
+#!/usr/bin/env bash
+
+DEVNIX_PROFILE=$1
+DEVNIX_INSTALLABLE=$2
+
+DEVNIX_SKIP=" _ HOME NIX_BUILD_TOP NIX_LOG_FD OLDPWD PWD SHELL SHLVL TEMP TEMPDIR TERM TMP TMPDIR USER "
+
+quote() {
+    printf "'%s'" "${1//\'/\'\\\'\'}"
+}
+
+declare -A DEVNIX_BEFORE
+while IFS= read -r -d '' kv; do
+    DEVNIX_BEFORE[${kv%%=*}]=${kv#*=}
+done < <(env -0)
+
+DEVNIX_SCRIPT=$(nix print-dev-env --print-build-logs --profile "${DEVNIX_PROFILE}" "${DEVNIX_INSTALLABLE}") || exit 1
+eval "${DEVNIX_SCRIPT}" < /dev/null >&2
+
+while IFS= read -r -d '' kv; do
+    name=${kv%%=*}
+    value=${kv#*=}
+    old=${DEVNIX_BEFORE[${name}]-}
+
+    [[ ${DEVNIX_SKIP} = *" ${name} "* ]] && continue
+    [[ ${name} =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    [[ -v DEVNIX_BEFORE[${name}] && ${old} = "${value}" ]] && continue
+
+    # Keep the value of the shell for list variables such as PATH
+    if [[ -n ${old} && ${value} = *":${old}" ]]; then
+        echo "export ${name}=$(quote "${value%":${old}"}"):\"\${${name}}\""
+    elif [[ -n ${old} && ${value} = "${old}:"* ]]; then
+        echo "export ${name}=\"\${${name}}\":$(quote "${value#"${old}:"}")"
+    else
+        echo "export ${name}=$(quote "${value}")"
+    fi
+done < <(env -0)
+EOF
+chmod +x /usr/local/share/devnix/capture.sh
+
 cat << 'EOF' > /usr/local/bin/devnix
 #!/usr/bin/env bash
 
@@ -159,11 +204,11 @@ usage() {
 Usage: devnix <command>
 
 Commands:
-  build      Build the environment when dev.nix changed since the last build
-  rebuild    Build the environment even when dev.nix did not change
+  build      Build the environment when dev.nix or flake.nix changed since the last build
+  rebuild    Build the environment even when nothing changed
   start      Build when autoRebuild is enabled, then run the onStart hooks
   run STAGE  Run the hooks of STAGE (onCreate or onStart)
-  status     Show the dev.nix file and the current environment
+  status     Show the environment file and the current environment
 USAGE
 }
 
@@ -179,12 +224,37 @@ resolve_file() {
     fi
 }
 
+# Hash the environment file, its lock file and the options that change the result
 checksum() {
-    sha256sum "$1" | cut -d' ' -f1
+    local file=$1
+    {
+        cat "${file}"
+        if [[ $(basename "${file}") = flake.nix ]]; then
+            cat "$(dirname "${file}")/flake.lock" 2> /dev/null || true
+        fi
+        echo "${DEVNIX_CHANNEL} ${DEVNIX_ALLOW_UNFREE} ${DEVNIX_DEV_SHELL}"
+    } | sha256sum | cut -d' ' -f1
+}
+
+build_devnix() {
+    nix build \
+        --impure \
+        --print-build-logs \
+        --profile "${DEVNIX_PROFILE}" \
+        --file /usr/local/share/devnix/eval.nix \
+        --argstr file "$1" \
+        --argstr channel "${DEVNIX_CHANNEL}" \
+        --arg allowUnfree "${DEVNIX_ALLOW_UNFREE}"
+
+    cp "${DEVNIX_PROFILE}/share/devnix/env.sh" "${DEVNIX_STATE}/env.sh.new"
+}
+
+build_flake() {
+    /usr/local/share/devnix/capture.sh "${DEVNIX_PROFILE}" "$(dirname "$1")#${DEVNIX_DEV_SHELL}" > "${DEVNIX_STATE}/env.sh.new"
 }
 
 build() {
-    local file
+    local file sum
     file=$(resolve_file)
 
     if [[ -z ${file} || ! -f ${file} ]]; then
@@ -193,22 +263,22 @@ build() {
     fi
 
     echo "${file}" > "${DEVNIX_STATE}/file"
+    sum=$(checksum "${file}")
 
-    if [[ $1 != force && -e ${DEVNIX_PROFILE} && $(checksum "${file}") = $(cat "${DEVNIX_STATE}/checksum" 2> /dev/null) ]]; then
+    if [[ $1 != force && -e ${DEVNIX_PROFILE} && ${sum} = $(cat "${DEVNIX_STATE}/checksum" 2> /dev/null) ]]; then
         echo "devnix: environment is up to date"
         return 0
     fi
 
     echo "devnix: building environment from ${file} ..."
-    nix build \
-        --impure \
-        --print-build-logs \
-        --profile "${DEVNIX_PROFILE}" \
-        --file /usr/local/share/devnix/eval.nix \
-        --argstr file "${file}" \
-        --argstr channel "${DEVNIX_CHANNEL}" \
-        --arg allowUnfree "${DEVNIX_ALLOW_UNFREE}"
+    if [[ $(basename "${file}") = flake.nix ]]; then
+        build_flake "${file}"
+    else
+        build_devnix "${file}"
+    fi
 
+    mv "${DEVNIX_STATE}/env.sh.new" "${DEVNIX_STATE}/env.sh"
+    # Hash again, the build can create or update flake.lock
     checksum "${file}" > "${DEVNIX_STATE}/checksum"
     echo "devnix: environment is ready, open a new terminal to load it"
 }
@@ -218,7 +288,7 @@ run() {
 
     [[ -f ${hooks} ]] || return 0
 
-    [[ -r ${DEVNIX_PROFILE}/share/devnix/env.sh ]] && . "${DEVNIX_PROFILE}/share/devnix/env.sh"
+    [[ -r ${DEVNIX_STATE}/env.sh ]] && . "${DEVNIX_STATE}/env.sh"
     export PATH=${DEVNIX_PROFILE}/bin:${PATH}
 
     while IFS= read -r name; do
@@ -235,6 +305,7 @@ run() {
 status() {
     echo "file:    $(resolve_file || true)"
     echo "channel: ${DEVNIX_CHANNEL}"
+    echo "shell:   ${DEVNIX_DEV_SHELL}"
     if [[ -e ${DEVNIX_PROFILE} ]]; then
         echo "profile: $(readlink -f "${DEVNIX_PROFILE}")"
     else
@@ -261,10 +332,10 @@ esac
 EOF
 chmod +x /usr/local/bin/devnix
 
-# Load the env of dev.nix in login, interactive and zsh shells
+# Load the env of the environment in login, interactive and zsh shells
 cat << 'EOF' > /etc/profile.d/devnix.sh
-if [ -r /nix/var/devnix/profile/share/devnix/env.sh ]; then
-    . /nix/var/devnix/profile/share/devnix/env.sh
+if [ -r /nix/var/devnix/env.sh ]; then
+    . /nix/var/devnix/env.sh
 fi
 EOF
 
