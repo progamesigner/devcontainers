@@ -1,0 +1,33 @@
+{
+    "id": "swift",
+    "version": "1.0.0",
+    "name": "Swift",
+    "description": "Install Swift",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Swift release version to install"
+        }
+    },
+    "containerEnv": {
+        "SWIFT_HOME": "/opt/swift",
+        "PATH": "${PATH}:/opt/swift/usr/bin"
+    },
+    "capAdd": [
+        "SYS_PTRACE"
+    ],
+    "securityOpt": [
+        "seccomp=unconfined"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "swiftlang.swift-vscode"
+            ]
+        }
+    }
+}
