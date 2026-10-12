@@ -2,7 +2,7 @@
     "id": "nix",
     "version": "1.0.0",
     "name": "Nix",
-    "description": "Install Nix and prepare the development environment declared in a dev.nix file or a flake devShell when the container is created or started",
+    "description": "Install Nix and configure a dev.nix environment or flake devShell",
     "options": {
         "version": {
             "type": "string",
@@ -16,7 +16,7 @@
         "file": {
             "type": "string",
             "default": ".devcontainer/dev.nix",
-            "description": "Path of the environment file, relative to the workspace folder. Use a dev.nix file, or a flake.nix file to load one of its devShells. Nothing is prepared when the file does not exist.",
+            "description": "Path to dev.nix or flake.nix, relative to the workspace folder",
             "proposals": [
                 ".devcontainer/dev.nix",
                 ".idx/dev.nix",
@@ -35,12 +35,12 @@
                 "unstable"
             ],
             "default": "stable-26.05",
-            "description": "Default nixpkgs channel when dev.nix does not set `channel`. Accepts stable-<release>, unstable, a nixpkgs branch name or a nixpkgs commit. Not used for flake.nix."
+            "description": "Default nixpkgs channel for dev.nix: stable-<release>, unstable, a branch or a commit"
         },
         "allowUnfree": {
             "type": "boolean",
             "default": false,
-            "description": "Allow packages with an unfree license. Not used for flake.nix."
+            "description": "Allow packages with an unfree license in dev.nix"
         },
         "autoRebuild": {
             "type": "boolean",
