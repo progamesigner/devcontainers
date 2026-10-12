@@ -1,0 +1,30 @@
+{
+    "id": "kotlin",
+    "version": "1.0.0",
+    "name": "Kotlin",
+    "description": "Install Kotlin",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "none"
+            ],
+            "default": "none",
+            "description": "Select or enter a Kotlin version to install"
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/progamesigner/devcontainers/features/java"
+    ],
+    "containerEnv": {
+        "KOTLIN_HOME": "/opt/kotlin",
+        "PATH": "${PATH}:/opt/kotlin/bin"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "JetBrains.kotlin-server"
+            ]
+        }
+    }
+}
