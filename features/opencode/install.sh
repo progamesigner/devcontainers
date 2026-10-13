@@ -32,10 +32,15 @@ if [[ ${OPENCODE_VERSION} != none ]]; then
 
     PACKAGE_SCOPE=@opencode
     if [[ ${OPENCODE_VERSION} = latest ]]; then
-        OPENCODE_METADATA=$(curl -sSL https://opencode.ai/update/api/latest/cli/npm)
-        OPENCODE_VERSION=$(jq -r ".version" <<< "${OPENCODE_METADATA}")
-        PACKAGE_SCOPE=$(jq -r ".metadata.package" <<< "${OPENCODE_METADATA}")
-        PACKAGE_SCOPE=${PACKAGE_SCOPE%/cli}
+        OPENCODE_METADATA=$(curl -sSL https://opencode.ai/update/api/latest/cli/npm || true)
+        if jq -e ".version and .metadata.package" <<< "${OPENCODE_METADATA}" > /dev/null 2>&1; then
+            OPENCODE_VERSION=$(jq -r ".version" <<< "${OPENCODE_METADATA}")
+            PACKAGE_SCOPE=$(jq -r ".metadata.package" <<< "${OPENCODE_METADATA}")
+            PACKAGE_SCOPE=${PACKAGE_SCOPE%/cli}
+        else
+            # Fall back to the npm registry when the update API is unavailable
+            OPENCODE_VERSION=$(curl -sSL https://registry.npmjs.org/${PACKAGE_SCOPE}%2fcli/latest | jq -r ".version")
+        fi
     fi
 
     OPENCODE_VERSION=${OPENCODE_VERSION#v}
